@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react';
+import { Eye, EyeOff, Lock, Mail, User, Shield } from 'lucide-react';
 import * as authService from '../../services/awsAuthService';
 import { isAuthenticated } from '../../services/awsAuthService';
 
@@ -179,8 +179,12 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <Card className="w-full border shadow-lg">
+    <Card className="w-full border shadow-lg backdrop-blur-sm bg-card/90 dark:bg-card/90 transition-all duration-300 hover:shadow-xl">
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 rounded-lg"></div>
       <CardHeader className="space-y-1">
+        <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-purple-500 rounded-full flex items-center justify-center mb-2 shadow-lg">
+          <User className="h-6 w-6 text-white" />
+        </div>
         <CardTitle className="text-2xl font-bold text-center">
           {showConfirmation 
             ? 'Verify Your Account' 
@@ -198,32 +202,36 @@ const AuthForm: React.FC = () => {
         {showConfirmation ? (
           <form onSubmit={handleConfirmSignUp} className="space-y-4">
             <div className="space-y-2">
-              <div className="relative">
-                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <div className="relative group">
+                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                 <Input
                   id="confirmation-username"
                   type="text"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   placeholder="Enter your username"
-                  className="pl-10"
+                  className="pl-10 transition-all focus:border-primary"
                   disabled={isLoading}
                   required
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Input
-                id="confirmation-code"
-                type="text"
-                value={confirmationCode}
-                onChange={(e) => setConfirmationCode(e.target.value)}
-                placeholder="Enter verification code"
-                disabled={isLoading}
-                required
-              />
+              <div className="relative group">
+                <Shield className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                <Input
+                  id="confirmation-code"
+                  type="text"
+                  value={confirmationCode}
+                  onChange={(e) => setConfirmationCode(e.target.value)}
+                  placeholder="Enter verification code"
+                  className="pl-10 transition-all focus:border-primary"
+                  disabled={isLoading}
+                  required
+                />
+              </div>
             </div>
-            <Button type="submit" className="w-full font-semibold" disabled={isLoading}>
+            <Button type="submit" className="w-full font-semibold bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 transition-all duration-300" disabled={isLoading}>
               {isLoading ? 'Verifying...' : 'Verify Account'}
             </Button>
           </form>
@@ -234,32 +242,32 @@ const AuthForm: React.FC = () => {
               <TabsTrigger value="signup">Sign Up</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="login">
+            <TabsContent value="login" className="space-y-4">
               <form onSubmit={handleLogin} className="space-y-4">
                 <div className="space-y-4">
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="login-username"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Username"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
                   </div>
                   
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="login-password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Password"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
@@ -267,59 +275,63 @@ const AuthForm: React.FC = () => {
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
+                      className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
                       onClick={togglePasswordVisibility}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 transition-all duration-300" 
+                  disabled={isLoading}
+                >
                   {isLoading ? 'Logging in...' : 'Login'}
                 </Button>
               </form>
             </TabsContent>
             
-            <TabsContent value="signup">
+            <TabsContent value="signup" className="space-y-4">
               <form onSubmit={handleSignUp} className="space-y-4">
                 <div className="space-y-4">
-                  <div className="relative">
-                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="signup-username"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Choose a username"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
                   </div>
                   
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="signup-email"
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email address"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
                   </div>
                   
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="signup-password"
                       type={showPassword ? "text" : "password"}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Choose a password"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
@@ -327,28 +339,32 @@ const AuthForm: React.FC = () => {
                       type="button" 
                       variant="ghost" 
                       size="icon" 
-                      className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground"
+                      className="absolute right-0 top-0 h-full px-3 py-2 text-muted-foreground hover:text-foreground"
                       onClick={togglePasswordVisibility}
                     >
                       {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </Button>
                   </div>
                   
-                  <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <div className="relative group">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                     <Input
                       id="signup-confirm-password"
                       type={showPassword ? "text" : "password"}
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="pl-10"
+                      className="pl-10 transition-all focus:border-primary"
                       disabled={isLoading}
                       required
                     />
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={isLoading}>
+                <Button 
+                  type="submit" 
+                  className="w-full bg-gradient-to-r from-primary to-purple-500 hover:from-primary/90 hover:to-purple-500/90 transition-all duration-300" 
+                  disabled={isLoading}
+                >
                   {isLoading ? 'Creating account...' : 'Create Account'}
                 </Button>
               </form>
@@ -356,6 +372,13 @@ const AuthForm: React.FC = () => {
           </Tabs>
         )}
       </CardContent>
+      <CardFooter className="text-center text-sm text-muted-foreground pt-0">
+        <p className="w-full">
+          {activeTab === 'login' 
+            ? 'Securely manage your campus expenses with us' 
+            : 'Your data is encrypted and secure with us'}
+        </p>
+      </CardFooter>
     </Card>
   );
 };

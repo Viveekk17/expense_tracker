@@ -18,33 +18,41 @@ const Auth: React.FC = () => {
   }, [isAuthenticated, isLoading, navigate]);
   
   return (
-    <div className="min-h-screen bg-background py-8 md:py-12 flex flex-col">
-      <div className="absolute top-4 right-4">
+    <div className="relative min-h-screen bg-background transition-colors duration-300 overflow-hidden">
+      {/* Background decorations */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-[40%] -left-[20%] w-[80%] h-[80%] rounded-full bg-primary/5 dark:bg-primary/10 blur-3xl"></div>
+        <div className="absolute -bottom-[40%] -right-[20%] w-[80%] h-[80%] rounded-full bg-purple-500/5 dark:bg-purple-500/10 blur-3xl"></div>
+      </div>
+      
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-20">
         <ThemeToggle />
       </div>
 
-      <div className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-md space-y-8">
-          <div className="text-center">
-            <h1 className="text-4xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-              Campus Expense Compass
-            </h1>
-            <p className="text-lg text-muted-foreground mb-8 max-w-md">
-              Track, manage and analyze your student expenses with ease
-            </p>
+      {/* Main Content */}
+      <div className="flex flex-col min-h-screen">
+        <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
+          <div className="w-full max-w-md space-y-8 animate-fadeIn">
+            <div className="text-center">
+              <h1 className="text-4xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+                Campus Expense Compass
+              </h1>
+              <p className="text-lg text-muted-foreground mb-6 max-w-md mx-auto">
+                Track, manage and analyze your student expenses with ease
+              </p>
+            </div>
+            
+            <div className="animate-scaleIn">
+              <AuthForm />
+            </div>
           </div>
-          
-          <AuthForm />
-          
-          <div className="mt-8 text-center text-sm text-muted-foreground">
-            <p>Secure student expense tracking for budgeting success</p>
-          </div>
-        </div>
+        </main>
+        
+        <footer className="mt-auto py-4 text-center text-sm text-muted-foreground">
+          <p>© {new Date().getFullYear()} Campus Expense Compass. All rights reserved.</p>
+        </footer>
       </div>
-      
-      <footer className="mt-auto py-4 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Campus Expense Compass. All rights reserved.</p>
-      </footer>
     </div>
   );
 };

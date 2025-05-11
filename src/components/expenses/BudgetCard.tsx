@@ -24,19 +24,19 @@ const BudgetCard: React.FC = () => {
     
   // Determine status color based on percentage
   const getStatusColor = () => {
-    if (percentSpent < 50) return 'bg-blue-600';
+    if (percentSpent < 50) return 'bg-primary';
     if (percentSpent < 80) return 'bg-purple-600';
-    return 'bg-red-700';
+    return 'bg-red-600';
   };
 
   return (
-    <Card className="w-full bg-gray-900 border-0 shadow-md rounded-xl overflow-hidden">
+    <Card className="w-full bg-gray-900 dark:bg-gray-950 border-0 shadow-md rounded-xl overflow-hidden">
       <div className="h-2">
         <div className={`${getStatusColor()} h-full`} style={{ width: `${percentSpent}%` }}></div>
       </div>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg flex items-center text-white">
-          <div className="bg-gradient-to-r from-red-600 to-purple-600 p-1.5 rounded-md mr-2">
+          <div className="bg-gradient-to-r from-primary to-purple-600 p-1.5 rounded-md mr-2">
             <IndianRupeeIcon className="h-4 w-4 text-white" />
           </div>
           Monthly Budget
@@ -50,9 +50,9 @@ const BudgetCard: React.FC = () => {
               placeholder="Enter monthly budget"
               value={budget}
               onChange={(e) => setBudget(e.target.value)}
-              className="text-lg bg-gray-800 border-gray-700 text-white focus:ring-red-600"
+              className="text-lg bg-gray-800 dark:bg-gray-900 border-gray-700 text-white focus:ring-primary"
             />
-            <Button onClick={handleSaveBudget} className="w-full bg-gradient-to-r from-red-700 to-red-900 hover:opacity-90 text-white shadow-sm">
+            <Button onClick={handleSaveBudget} className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 text-white shadow-sm">
               Save Budget
             </Button>
           </div>
@@ -67,18 +67,18 @@ const BudgetCard: React.FC = () => {
                 variant="outline" 
                 size="sm" 
                 onClick={() => setIsEditing(true)}
-                className="border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+                className="border-gray-700 bg-gray-800 dark:bg-gray-900 text-white hover:bg-gray-700 hover:border-primary"
               >
                 Edit
               </Button>
             </div>
             
             <div className="grid grid-cols-2 gap-4 mt-4">
-              <div className="bg-gray-800 rounded-lg p-3">
+              <div className="bg-gray-800 dark:bg-gray-900 rounded-lg p-3">
                 <p className="text-xs text-gray-400 mb-1">Spent</p>
-                <p className="text-xl font-semibold text-blue-300">₹{totalSpent}</p>
+                <p className="text-xl font-semibold text-primary">₹{totalSpent}</p>
               </div>
-              <div className={`rounded-lg p-3 ${remainingBudget >= 0 ? 'bg-gray-800' : 'bg-red-900/30'}`}>
+              <div className={`rounded-lg p-3 ${remainingBudget >= 0 ? 'bg-gray-800 dark:bg-gray-900' : 'bg-red-900/30'}`}>
                 <p className="text-xs text-gray-400 mb-1">Remaining</p>
                 <p className={`text-xl font-semibold ${remainingBudget >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                   ₹{Math.abs(remainingBudget)}
@@ -91,7 +91,7 @@ const BudgetCard: React.FC = () => {
                 <p className="text-xs text-gray-400">{percentSpent.toFixed(0)}% used</p>
                 <p className="text-xs text-gray-400">{(100 - percentSpent).toFixed(0)}% available</p>
               </div>
-              <div className="bg-gray-800 rounded-full h-2 w-full overflow-hidden">
+              <div className="bg-gray-800 dark:bg-gray-900 rounded-full h-2 w-full overflow-hidden">
                 <div 
                   className={`${getStatusColor()} h-full transition-all duration-700 ease-in-out`} 
                   style={{ width: `${percentSpent}%` }}
@@ -116,7 +116,7 @@ const BudgetCard: React.FC = () => {
               </>
             ) : (
               <>
-                <TrendingUp className="h-4 w-4 text-blue-400" />
+                <TrendingUp className="h-4 w-4 text-primary" />
                 <p>You have ₹{remainingBudget} left to spend this month</p>
               </>
             )}
