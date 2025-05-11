@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { ExpenseProvider } from './contexts/ExpenseContext';
 import { useExpense } from './contexts/ExpenseContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
@@ -51,15 +52,17 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <ExpenseProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </ExpenseProvider>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <ExpenseProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </ExpenseProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
