@@ -147,7 +147,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setUserDetails(updatedUser);
       toast({
         title: "Budget updated",
-        description: `Your monthly budget has been set to $${budget}.`,
+        description: `Your monthly budget has been set to ₹${budget}.`,
         variant: "default",
       });
     } catch (error: any) {
@@ -166,7 +166,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setExpenses(prev => [...prev, newExpense]);
       toast({
         title: "Expense added",
-        description: `$${newExpense.amount} expense has been recorded.`,
+        description: `₹${newExpense.amount} expense has been recorded.`,
         variant: "default",
       });
     } catch (error: any) {

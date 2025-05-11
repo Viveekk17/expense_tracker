@@ -65,26 +65,26 @@ const ExpenseForm: React.FC = () => {
   };
 
   return (
-    <Card className="w-full bg-white border-0 shadow-md rounded-xl">
+    <Card className="w-full bg-white dark:bg-gray-800/50 border-0 shadow-md rounded-xl">
       <div className="h-1 bg-gradient-to-r from-red-700 via-purple-700 to-black"></div>
       <CardHeader>
-        <CardTitle className="text-lg flex items-center">
+        <CardTitle className="text-lg flex items-center dark:text-gray-200">
           <div className="bg-gradient-to-r from-red-700 to-black p-1.5 rounded-md mr-2">
             <Receipt className="h-4 w-4 text-white" />
           </div>
           New Expense
         </CardTitle>
-        <CardDescription>Record your expenses to track your spending</CardDescription>
+        <CardDescription className="dark:text-gray-400">Record your expenses to track your spending</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-5">
           <div className="relative">
-            <label htmlFor="amount" className="text-sm font-medium text-gray-700 mb-1 block">
+            <label htmlFor="amount" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
               Amount
             </label>
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <IndianRupeeIcon className="h-5 w-5 text-gray-400" />
+                <IndianRupeeIcon className="h-5 w-5 text-gray-400 dark:text-gray-500" />
               </div>
               <Input
                 id="amount"
@@ -93,18 +93,18 @@ const ExpenseForm: React.FC = () => {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-10 focus:ring-red-600 focus:border-red-600"
+                className="pl-10 focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
                 required
               />
             </div>
           </div>
           
           <div>
-            <label htmlFor="category" className="text-sm font-medium text-gray-700 mb-1 block">
+            <label htmlFor="category" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
               Category
             </label>
             <Select value={category} onValueChange={setCategory} required>
-              <SelectTrigger id="category" className="focus:ring-red-600 focus:border-red-600">
+              <SelectTrigger id="category" className="focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700">
                 <SelectValue placeholder="Select expense category" />
               </SelectTrigger>
               <SelectContent>
@@ -118,7 +118,7 @@ const ExpenseForm: React.FC = () => {
           </div>
           
           <div>
-            <label htmlFor="date" className="text-sm font-medium text-gray-700 mb-1 block">
+            <label htmlFor="date" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
               Date of Expense
             </label>
             <Popover>
@@ -127,7 +127,7 @@ const ExpenseForm: React.FC = () => {
                   id="date"
                   variant={"outline"}
                   className={cn(
-                    "w-full justify-start text-left font-normal",
+                    "w-full justify-start text-left font-normal dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700",
                     !date && "text-muted-foreground"
                   )}
                 >
@@ -141,14 +141,14 @@ const ExpenseForm: React.FC = () => {
                   selected={date}
                   onSelect={setDate}
                   initialFocus
-                  className="rounded-md border"
+                  className="rounded-md border dark:bg-gray-900 dark:text-gray-200"
                 />
               </PopoverContent>
             </Popover>
           </div>
           
           <div>
-            <label htmlFor="description" className="text-sm font-medium text-gray-700 mb-1 block">
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
               Description (Optional)
             </label>
             <Textarea
@@ -157,7 +157,7 @@ const ExpenseForm: React.FC = () => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              className="resize-none focus:ring-red-600 focus:border-red-600"
+              className="resize-none focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
             />
           </div>
         </CardContent>

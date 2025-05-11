@@ -6,7 +6,7 @@ import ExpenseTable from '../components/expenses/ExpenseTable';
 import DashboardStats from '../components/expenses/DashboardStats';
 import { useExpense } from '../contexts/ExpenseContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { BarChart, PieChart, DollarSign, Calendar } from 'lucide-react';
+import { BarChart, PieChart, Calendar, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
 
 const Dashboard = () => {
   const { isLoading } = useExpense();
@@ -17,10 +17,10 @@ const Dashboard = () => {
       <AppLayout>
         <div className="flex items-center justify-center min-h-[50vh]">
           <div className="animate-pulse flex flex-col items-center">
-            <div className="w-16 h-16 rounded-full bg-primary/20 mb-4 flex items-center justify-center">
+            <div className="w-16 h-16 rounded-full bg-primary/20 dark:bg-primary/10 mb-4 flex items-center justify-center">
               <BarChart className="h-8 w-8 text-primary" />
             </div>
-            <p className="text-lg text-foreground">Loading your financial data...</p>
+            <p className="text-lg text-foreground dark:text-gray-300">Loading your financial data...</p>
           </div>
         </div>
       </AppLayout>
@@ -29,37 +29,85 @@ const Dashboard = () => {
   
   return (
     <AppLayout>
-      <div className="space-y-8">
-        <div className="border-b border-border pb-4 mb-6">
-          <h1 className="text-3xl font-bold gradient-text">
-            Financial Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1">Track and manage your campus expenses</p>
+      <div className="space-y-8 p-6">
+        {/* Header Section */}
+        <div className="dashboard-header bg-gradient-to-r from-primary/5 to-purple-500/5 dark:from-primary/10 dark:to-purple-500/10 rounded-xl p-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="dashboard-title text-4xl mb-2">
+                Financial Dashboard
+              </h1>
+              <p className="dashboard-subtitle text-lg">Track and manage your campus expenses</p>
+            </div>
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 bg-primary/10 dark:bg-primary/20 px-4 py-2 rounded-lg">
+                <Wallet className="h-5 w-5 text-primary" />
+                <span className="text-primary font-medium">Student Budget</span>
+              </div>
+            </div>
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-6">
-            <div className="card-hover">
-              <BudgetCard />
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Left Column */}
+          <div className="space-y-8">
+            <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Budget Overview</h2>
+                  <div className="dashboard-badge">
+                    <TrendingUp className="h-4 w-4 mr-1 inline" />
+                    Monthly
+                  </div>
+                </div>
+                <BudgetCard />
+              </div>
             </div>
-            <DashboardStats />
+            
+            <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Expense Analytics</h2>
+                  <div className="dashboard-badge">
+                    <PieChart className="h-4 w-4 mr-1 inline" />
+                    Statistics
+                  </div>
+                </div>
+                <DashboardStats />
+              </div>
+            </div>
           </div>
-          <div className="card-hover">
-            <ExpenseForm />
+          
+          {/* Right Column */}
+          <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Add New Expense</h2>
+                <div className="dashboard-badge">
+                  <AlertCircle className="h-4 w-4 mr-1 inline" />
+                  Quick Add
+                </div>
+              </div>
+              <ExpenseForm />
+            </div>
           </div>
         </div>
         
-        <div className="rounded-xl bg-card dark:bg-card shadow-md p-6 border border-border mt-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-              <Calendar className="mr-2 h-5 w-5 text-primary" />
-              <h2 className="text-xl font-semibold text-card-foreground">Expense History</h2>
+        {/* Expense History Section */}
+        <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-3">
+                <Calendar className="h-6 w-6 text-primary" />
+                <h2 className="text-2xl font-semibold text-card-foreground dark:text-gray-200">Expense History</h2>
+              </div>
+              <div className="dashboard-badge text-base px-4 py-2">
+                All transactions
+              </div>
             </div>
-            <div className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full">
-              All transactions
-            </div>
+            <ExpenseTable />
           </div>
-          <ExpenseTable />
         </div>
       </div>
     </AppLayout>

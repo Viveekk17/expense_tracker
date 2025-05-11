@@ -27,11 +27,13 @@ const Auth: React.FC = () => {
       
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-20">
-        <ThemeToggle />
+        <div className="p-2 rounded-full bg-card/80 backdrop-blur-sm border border-border shadow-lg">
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col min-h-screen">
+      <div className="relative flex flex-col min-h-screen">
         <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <div className="w-full max-w-md space-y-8 animate-fadeIn">
             <div className="text-center">

@@ -253,7 +253,7 @@ const AuthForm: React.FC = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Username"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />
@@ -267,7 +267,7 @@ const AuthForm: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Password"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />
@@ -303,7 +303,7 @@ const AuthForm: React.FC = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Choose a username"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />
@@ -317,7 +317,7 @@ const AuthForm: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email address"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />
@@ -331,7 +331,7 @@ const AuthForm: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Choose a password"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />
@@ -354,7 +354,7 @@ const AuthForm: React.FC = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="pl-10 transition-all focus:border-primary dark:bg-card"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card dark:text-foreground dark:placeholder:text-muted-foreground"
                       disabled={isLoading}
                       required
                     />

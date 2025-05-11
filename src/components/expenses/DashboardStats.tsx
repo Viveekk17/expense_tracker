@@ -50,10 +50,10 @@ const DashboardStats: React.FC = () => {
     
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <Card className="bg-white border-0 shadow-sm rounded-xl overflow-hidden">
+      <Card className="bg-white dark:bg-gray-800/50 border-0 shadow-sm rounded-xl overflow-hidden">
         <div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-300 flex items-center">
             <PieChart className="h-4 w-4 mr-2 text-indigo-400" />
             Top Categories
           </CardTitle>
@@ -65,22 +65,22 @@ const DashboardStats: React.FC = () => {
                 <div key={category} className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-blue-500' : index === 1 ? 'bg-indigo-500' : 'bg-purple-500'}`}></div>
-                    <span className="text-sm font-medium">{category}</span>
+                    <span className="text-sm font-medium dark:text-gray-200">{category}</span>
                   </div>
-                  <span className="text-sm text-gray-700">₹{amount.toFixed(0)}</span>
+                  <span className="text-sm text-gray-700 dark:text-gray-300">₹{amount.toFixed(0)}</span>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="py-2 text-gray-500 text-sm">No data available yet</div>
+            <div className="py-2 text-gray-500 dark:text-gray-400 text-sm">No data available yet</div>
           )}
         </CardContent>
       </Card>
       
-      <Card className="bg-white border-0 shadow-sm rounded-xl overflow-hidden">
+      <Card className="bg-white dark:bg-gray-800/50 border-0 shadow-sm rounded-xl overflow-hidden">
         <div className="h-1 bg-gradient-to-r from-emerald-400 to-green-500"></div>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-300 flex items-center">
             <TrendingUp className="h-4 w-4 mr-2 text-emerald-400" />
             7 Day Trend
           </CardTitle>
@@ -89,27 +89,27 @@ const DashboardStats: React.FC = () => {
           {expenses.length > 0 ? (
             <div>
               <div className="flex items-baseline">
-                <div className="text-2xl font-bold text-gray-800">₹{last7DaysTotal.toFixed(0)}</div>
+                <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">₹{last7DaysTotal.toFixed(0)}</div>
                 {previous7DaysTotal > 0 && (
-                  <div className={`ml-2 text-xs px-1.5 py-0.5 rounded-full font-medium ${isIncrease ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'}`}>
+                  <div className={`ml-2 text-xs px-1.5 py-0.5 rounded-full font-medium ${isIncrease ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' : 'bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300'}`}>
                     {isIncrease ? '+' : ''}{percentChange.toFixed(0)}%
                   </div>
                 )}
               </div>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 vs ₹{previous7DaysTotal.toFixed(0)} previous week
               </p>
             </div>
           ) : (
-            <div className="py-2 text-gray-500 text-sm">No data available yet</div>
+            <div className="py-2 text-gray-500 dark:text-gray-400 text-sm">No data available yet</div>
           )}
         </CardContent>
       </Card>
       
-      <Card className="bg-white border-0 shadow-sm rounded-xl overflow-hidden">
+      <Card className="bg-white dark:bg-gray-800/50 border-0 shadow-sm rounded-xl overflow-hidden">
         <div className="h-1 bg-gradient-to-r from-amber-400 to-orange-500"></div>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-500 flex items-center">
+          <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-300 flex items-center">
             <BarChart3 className="h-4 w-4 mr-2 text-amber-400" />
             Largest Expense
           </CardTitle>
@@ -117,18 +117,18 @@ const DashboardStats: React.FC = () => {
         <CardContent>
           {highestExpense ? (
             <div>
-              <div className="text-2xl font-bold text-gray-800">₹{highestExpense.amount.toFixed(0)}</div>
+              <div className="text-2xl font-bold text-gray-800 dark:text-gray-200">₹{highestExpense.amount.toFixed(0)}</div>
               <div className="flex items-center gap-1 mt-1">
-                <span className="px-1.5 py-0.5 bg-amber-50 text-amber-800 rounded-full text-xs">
+                <span className="px-1.5 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-800 dark:text-amber-300 rounded-full text-xs">
                   {highestExpense.category}
                 </span>
-                <span className="text-xs text-gray-500 truncate">
+                <span className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {highestExpense.description ? `- ${highestExpense.description}` : ""}
                 </span>
               </div>
             </div>
           ) : (
-            <div className="py-2 text-gray-500 text-sm">No data available yet</div>
+            <div className="py-2 text-gray-500 dark:text-gray-400 text-sm">No data available yet</div>
           )}
         </CardContent>
       </Card>
