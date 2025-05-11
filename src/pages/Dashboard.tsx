@@ -31,7 +31,7 @@ const Dashboard = () => {
     <AppLayout>
       <div className="space-y-8">
         <div className="border-b border-border pb-4 mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-purple-500 bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold gradient-text">
             Financial Dashboard
           </h1>
           <p className="text-muted-foreground mt-1">Track and manage your campus expenses</p>
@@ -39,12 +39,12 @@ const Dashboard = () => {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-6">
-            <div className="transform transition-all duration-300 hover:translate-y-[-4px] hover:shadow-lg">
+            <div className="card-hover">
               <BudgetCard />
             </div>
             <DashboardStats />
           </div>
-          <div className="transform transition-all duration-300 hover:translate-y-[-4px] hover:shadow-lg">
+          <div className="card-hover">
             <ExpenseForm />
           </div>
         </div>

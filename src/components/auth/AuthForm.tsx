@@ -179,7 +179,7 @@ const AuthForm: React.FC = () => {
   };
 
   return (
-    <Card className="w-full border shadow-lg backdrop-blur-sm bg-card/90 dark:bg-card/90 transition-all duration-300 hover:shadow-xl">
+    <Card className="w-full border shadow-lg glassmorphism transition-all duration-300 hover:shadow-xl">
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/10 via-transparent to-purple-500/10 rounded-lg"></div>
       <CardHeader className="space-y-1">
         <div className="w-12 h-12 mx-auto bg-gradient-to-br from-primary to-purple-500 rounded-full flex items-center justify-center mb-2 shadow-lg">
@@ -253,7 +253,7 @@ const AuthForm: React.FC = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Username"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />
@@ -267,7 +267,7 @@ const AuthForm: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Password"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />
@@ -303,7 +303,7 @@ const AuthForm: React.FC = () => {
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       placeholder="Choose a username"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />
@@ -317,7 +317,7 @@ const AuthForm: React.FC = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="Email address"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />
@@ -331,7 +331,7 @@ const AuthForm: React.FC = () => {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Choose a password"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />
@@ -354,7 +354,7 @@ const AuthForm: React.FC = () => {
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       placeholder="Confirm your password"
-                      className="pl-10 transition-all focus:border-primary"
+                      className="pl-10 transition-all focus:border-primary dark:bg-card"
                       disabled={isLoading}
                       required
                     />

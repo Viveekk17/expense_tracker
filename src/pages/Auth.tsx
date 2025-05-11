@@ -35,7 +35,7 @@ const Auth: React.FC = () => {
         <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-12 md:py-16">
           <div className="w-full max-w-md space-y-8 animate-fadeIn">
             <div className="text-center">
-              <h1 className="text-4xl font-extrabold tracking-tight mb-2 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-600">
+              <h1 className="text-4xl font-extrabold tracking-tight mb-2 gradient-text">
                 Campus Expense Compass
               </h1>
               <p className="text-lg text-muted-foreground mb-6 max-w-md mx-auto">
