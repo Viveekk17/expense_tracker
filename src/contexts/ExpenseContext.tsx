@@ -27,6 +27,7 @@ interface ExpenseContextType {
   isAuthenticated: boolean;
   setMonthlyBudget: (budget: number) => Promise<void>;
   addExpense: (expense: Omit<Expense, 'userId' | 'expenseId'>) => Promise<void>;
+  deleteExpense: (expenseId: string) => Promise<void>;
   generateReport: () => Promise<string>;
   totalSpent: number;
   remainingBudget: number;
@@ -53,6 +54,7 @@ const ExpenseContext = createContext<ExpenseContextType>({
   isAuthenticated: false,
   setMonthlyBudget: async () => {},
   addExpense: async () => {},
+  deleteExpense: async () => {},
   generateReport: async () => '',
   totalSpent: 0,
   remainingBudget: 0
@@ -179,6 +181,25 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
+  const deleteExpense = async (expenseId: string) => {
+    try {
+      await awsExpenseService.deleteExpense(expenseId);
+      setExpenses(prev => prev.filter(exp => exp.expenseId !== expenseId));
+      toast({
+        title: "Expense deleted",
+        description: "The expense has been removed successfully.",
+        variant: "default",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Error deleting expense",
+        description: error.message,
+        variant: "destructive",
+      });
+      throw error;
+    }
+  };
+
   const generateReport = async () => {
     if (expenses.length === 0) {
       toast({
@@ -217,6 +238,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
     isAuthenticated: authStatus,
     setMonthlyBudget,
     addExpense,
+    deleteExpense,
     generateReport,
     totalSpent,
     remainingBudget

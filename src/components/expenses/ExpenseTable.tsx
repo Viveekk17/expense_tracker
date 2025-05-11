@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
-import { DownloadIcon, FileSpreadsheet, IndianRupeeIcon, Tag, Calendar, Search } from 'lucide-react';
+import { DownloadIcon, FileSpreadsheet, IndianRupeeIcon, Tag, Calendar, Search, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -15,13 +15,24 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const ExpenseTable: React.FC = () => {
-  const { expenses, categories, generateReport } = useExpense();
+  const { expenses, categories, generateReport, deleteExpense } = useExpense();
   const { theme } = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [loading, setLoading] = useState(false);
+  const [expenseToDelete, setExpenseToDelete] = useState<string | null>(null);
   
   // Filter expenses based on search term and category
   const filteredExpenses = expenses.filter(expense => {
@@ -81,6 +92,21 @@ const ExpenseTable: React.FC = () => {
     const darkColor = darkColors[category] || 'dark:bg-gray-800 dark:text-gray-200 dark:border-gray-700';
     
     return `${lightColor} ${darkColor}`;
+  };
+
+  const handleDeleteClick = (expenseId: string) => {
+    setExpenseToDelete(expenseId);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (expenseToDelete) {
+      try {
+        await deleteExpense(expenseToDelete);
+      } catch (error) {
+        console.error('Error deleting expense:', error);
+      }
+      setExpenseToDelete(null);
+    }
   };
 
   return (
@@ -195,10 +221,20 @@ const ExpenseTable: React.FC = () => {
                       <TableCell className="max-w-[200px] truncate">
                         {expense.description || <span className="text-muted-foreground text-sm italic">No description</span>}
                       </TableCell>
-                      <TableCell className="text-right font-medium whitespace-nowrap">
-                        <div className="flex items-center justify-end">
-                          <IndianRupeeIcon className="h-3 w-3 mr-1 text-muted-foreground" />
-                          <span>{expense.amount.toFixed(2)}</span>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center">
+                            <IndianRupeeIcon className="h-3 w-3 mr-1 text-muted-foreground" />
+                            <span>{expense.amount.toFixed(2)}</span>
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive/90 hover:bg-destructive/10"
+                            onClick={() => handleDeleteClick(expense.expenseId)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -209,6 +245,26 @@ const ExpenseTable: React.FC = () => {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!expenseToDelete} onOpenChange={() => setExpenseToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Expense</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this expense? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

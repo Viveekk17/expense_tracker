@@ -1,4 +1,4 @@
-import { get, post, put } from 'aws-amplify/api';
+import { get, post, put, del } from 'aws-amplify/api';
 import { getCurrentUser } from './awsAuthService';
 
 const API_NAME = 'CampusExpenseCompassAPI';
@@ -67,7 +67,7 @@ export const createUser = async (email: string): Promise<User> => {
     try {
       const operation = post({
         apiName: API_NAME,
-        path: '/CampusExpenseCompass-Users',
+        path: '/users',
         options: {
           body: newUser,
           headers: {
@@ -111,7 +111,7 @@ export const updateUserBudget = async (monthlyBudget: number): Promise<User> => 
     const userId = currentUser.username;
     console.log('Using userId:', userId);
     
-    console.log('Making API PUT request to:', `/CampusExpenseCompass-Users/${userId}`);
+    console.log('Making API PUT request to:', `/users/${userId}`);
     console.log('Request body:', { monthlyBudget });
     console.log('Using API name:', API_NAME);
     
@@ -119,7 +119,7 @@ export const updateUserBudget = async (monthlyBudget: number): Promise<User> => 
     try {
       const operation = put({
         apiName: API_NAME,
-        path: `/CampusExpenseCompass-Users/${userId}`,
+        path: `/users/${userId}`,
         options: {
           body: { monthlyBudget },
           headers: {
@@ -188,12 +188,12 @@ export const getUserDetails = async (): Promise<User | null> => {
     const userId = currentUser.username;
     console.log('Using userId for details:', userId);
     
-    console.log('Making API GET request for user details:', `/CampusExpenseCompass-Users/${userId}`);
+    console.log('Making API GET request for user details:', `/users/${userId}`);
     
     try {
       const operation = get({
         apiName: API_NAME,
-        path: `/CampusExpenseCompass-Users/${userId}`,
+        path: `/users/${userId}`,
         options: {
           headers: {
             'Content-Type': 'application/json'
@@ -261,7 +261,7 @@ export const addExpense = async (expense: Omit<Expense, 'userId' | 'expenseId'>)
     try {
       const operation = post({
         apiName: API_NAME,
-        path: '/CampusExpenseCompass-Expenses',
+        path: '/expenses',
         options: {
           body: newExpense,
           headers: {
@@ -315,12 +315,12 @@ export const getExpenses = async (): Promise<Expense[]> => {
     const userId = currentUser.username;
     console.log('Using userId for expense list:', userId);
     
-    console.log('Making API GET request for expenses:', `/CampusExpenseCompass-Expenses/user/${userId}`);
+    console.log('Making API GET request for expenses:', `/expenses/user/${userId}`);
     
     try {
       const operation = get({
         apiName: API_NAME,
-        path: `/CampusExpenseCompass-Expenses/user/${userId}`,
+        path: `/expenses/user/${userId}`,
         options: {
           headers: {
             'Content-Type': 'application/json'
@@ -375,7 +375,7 @@ export const generateReportUrl = async (): Promise<string> => {
       // Try the API first
       const operation = get({
         apiName: API_NAME,
-        path: `/CampusExpenseCompass-Reports/${userId}`,
+        path: `/reports/${userId}`,
         options: {
           headers: {
             'Content-Type': 'application/json'
@@ -428,6 +428,60 @@ export const generateReportUrl = async (): Promise<string> => {
     }
   } catch (error) {
     console.error('Error generating report:', error);
+    throw error;
+  }
+};
+
+export const deleteExpense = async (expenseId: string): Promise<void> => {
+  try {
+    console.log('Starting deleteExpense for expenseId:', expenseId);
+    
+    const currentUser = await getCurrentUser();
+    console.log('Current user for expense deletion:', currentUser);
+    
+    if (!currentUser) {
+      throw new Error('User not authenticated');
+    }
+
+    const userId = currentUser.username;
+    console.log('Using userId for expense deletion:', userId);
+    
+    try {
+      const operation = del({
+        apiName: API_NAME,
+        path: `/expenses/${expenseId}`,
+        options: {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        }
+      });
+      
+      console.log('Delete expense operation created, awaiting response...');
+      const response = await operation.response;
+      console.log('Delete expense response received:', response);
+      
+      // Also remove from localStorage
+      const expensesKey = `expenses_${userId}`;
+      const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
+      const updatedExpenses = existingExpenses.filter(exp => exp.expenseId !== expenseId);
+      saveToLocalStorage(expensesKey, updatedExpenses);
+      
+      console.log('Expense deleted successfully');
+    } catch (apiError) {
+      console.error('API call error for expense deletion:', apiError);
+      console.log('Falling back to localStorage for expense deletion');
+      
+      // Fallback to localStorage
+      const expensesKey = `expenses_${userId}`;
+      const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
+      const updatedExpenses = existingExpenses.filter(exp => exp.expenseId !== expenseId);
+      saveToLocalStorage(expensesKey, updatedExpenses);
+      
+      console.log('Deleted expense from localStorage');
+    }
+  } catch (error) {
+    console.error('Error deleting expense:', error);
     throw error;
   }
 }; 
