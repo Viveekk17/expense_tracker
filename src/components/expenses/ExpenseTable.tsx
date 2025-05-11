@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { useExpense } from '../../contexts/ExpenseContext';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
-import { DownloadIcon, ListIcon, IndianRupeeIcon } from 'lucide-react';
+import { DownloadIcon, FileSpreadsheet, IndianRupeeIcon, Tag, Calendar, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -14,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
 
 const ExpenseTable: React.FC = () => {
   const { expenses, categories, generateReport } = useExpense();
@@ -47,91 +47,151 @@ const ExpenseTable: React.FC = () => {
     }
   };
 
+  // Get category color based on category name
+  const getCategoryColor = (category: string) => {
+    const colors: Record<string, string> = {
+      'Food': 'bg-orange-100 text-orange-800 border-orange-200',
+      'Travel': 'bg-blue-100 text-blue-800 border-blue-200',
+      'Rent': 'bg-red-100 text-red-800 border-red-200',
+      'Stationery': 'bg-amber-100 text-amber-800 border-amber-200',
+      'Utilities': 'bg-teal-100 text-teal-800 border-teal-200',
+      'Entertainment': 'bg-purple-100 text-purple-800 border-purple-200',
+      'Clothing': 'bg-indigo-100 text-indigo-800 border-indigo-200',
+      'Health': 'bg-green-100 text-green-800 border-green-200',
+      'Education': 'bg-sky-100 text-sky-800 border-sky-200',
+      'Other': 'bg-gray-100 text-gray-800 border-gray-200',
+    };
+    
+    return colors[category] || 'bg-gray-100 text-gray-800 border-gray-200';
+  };
+
   return (
-    <Card className="w-full">
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-lg flex items-center">
-          <ListIcon className="h-5 w-5 mr-1 text-primary" />
-          Expense History
-        </CardTitle>
-        <Button 
-          variant="outline"
-          size="sm"
-          onClick={handleDownloadReport}
-          disabled={loading || expenses.length === 0}
-          className="flex items-center text-xs"
-        >
-          <DownloadIcon className="h-4 w-4 mr-1" />
-          {loading ? 'Generating...' : 'Download CSV'}
-        </Button>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="flex flex-col sm:flex-row gap-2">
+    <div className="w-full">
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-4 w-4 text-gray-400" />
+            </div>
             <Input
-              placeholder="Search expenses..."
+              placeholder="Search expense descriptions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="flex-1"
+              className="pl-10 focus:ring-primary focus:border-primary"
             />
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="All Categories" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
-          
-          {expenses.length === 0 ? (
-            <div className="text-center py-8 text-neutral">
-              No expenses recorded yet. Add your first expense above!
+          <div className="flex flex-row gap-3">
+            <div className="relative w-full sm:w-[180px]">
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="focus:ring-primary focus:border-primary">
+                  <div className="flex items-center">
+                    <Tag className="h-4 w-4 mr-2 text-gray-400" />
+                    <SelectValue placeholder="All Categories" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Categories</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat} value={cat}>
+                      {cat}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          ) : sortedExpenses.length === 0 ? (
-            <div className="text-center py-8 text-neutral">
-              No expenses match your search criteria.
-            </div>
-          ) : (
-            <div className="rounded-md border overflow-hidden">
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Date</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead className="text-right">Amount</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {sortedExpenses.map((expense) => (
-                      <TableRow key={expense.expenseId}>
-                        <TableCell className="whitespace-nowrap">
-                          {format(parseISO(expense.date), 'MMM dd, yyyy')}
-                        </TableCell>
-                        <TableCell>{expense.category}</TableCell>
-                        <TableCell className="max-w-[200px] truncate">
-                          {expense.description || '-'}
-                        </TableCell>
-                        <TableCell className="text-right font-medium">
-                          ₹{expense.amount.toFixed(2)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </div>
-          )}
+            <Button 
+              variant="outline"
+              size="sm"
+              onClick={handleDownloadReport}
+              disabled={loading || expenses.length === 0}
+              className="bg-white border-gray-200 hover:bg-gray-50 text-gray-700"
+            >
+              {loading ? (
+                <span className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-primary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Exporting...</span>
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  <FileSpreadsheet className="h-4 w-4 mr-2 text-primary" />
+                  <span>Export</span>
+                </span>
+              )}
+            </Button>
+          </div>
         </div>
-      </CardContent>
-    </Card>
+        
+        {expenses.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col items-center">
+              <div className="rounded-full bg-gray-100 p-3 mb-3">
+                <IndianRupeeIcon className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No expenses yet</h3>
+              <p className="text-gray-500 max-w-sm">
+                Start tracking your spending by adding your first expense using the form above.
+              </p>
+            </div>
+          </div>
+        ) : sortedExpenses.length === 0 ? (
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-100 shadow-sm">
+            <div className="flex flex-col items-center">
+              <div className="rounded-full bg-gray-100 p-3 mb-3">
+                <Search className="h-8 w-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No matching expenses</h3>
+              <p className="text-gray-500 max-w-sm">
+                No expenses match your current search criteria. Try adjusting your filters.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-xl overflow-hidden bg-white border border-gray-100 shadow-sm">
+            <div className="overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-gray-50 hover:bg-gray-50">
+                    <TableHead>Date</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Description</TableHead>
+                    <TableHead className="text-right">Amount</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {sortedExpenses.map((expense) => (
+                    <TableRow key={expense.expenseId} className="hover:bg-gray-50">
+                      <TableCell className="whitespace-nowrap">
+                        <div className="flex items-center">
+                          <Calendar className="h-3 w-3 mr-2 text-gray-400" />
+                          {format(parseISO(expense.date), 'MMM dd, yyyy')}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={`font-normal ${getCategoryColor(expense.category)}`}>
+                          {expense.category}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-[200px] truncate">
+                        {expense.description || <span className="text-gray-400 text-sm italic">No description</span>}
+                      </TableCell>
+                      <TableCell className="text-right font-medium whitespace-nowrap">
+                        <div className="flex items-center justify-end">
+                          <IndianRupeeIcon className="h-3 w-3 mr-1 text-gray-500" />
+                          <span>{expense.amount.toFixed(2)}</span>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

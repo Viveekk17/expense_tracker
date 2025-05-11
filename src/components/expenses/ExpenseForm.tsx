@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useExpense } from '../../contexts/ExpenseContext';
 import { Button } from '@/components/ui/button';
@@ -21,7 +20,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { CalendarIcon, Plus, IndianRupeeIcon } from 'lucide-react';
+import { CalendarIcon, Plus, IndianRupeeIcon, Receipt, CheckCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +30,7 @@ const ExpenseForm: React.FC = () => {
   const [date, setDate] = useState<Date | undefined>(new Date());
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   
   const { categories, addExpense } = useExpense();
 
@@ -48,6 +48,10 @@ const ExpenseForm: React.FC = () => {
         description
       });
       
+      // Show success state briefly
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 2000);
+      
       // Reset form
       setAmount('');
       setCategory('');
@@ -61,19 +65,27 @@ const ExpenseForm: React.FC = () => {
   };
 
   return (
-    <Card className="w-full">
+    <Card className="w-full bg-white border-0 shadow-md rounded-xl">
+      <div className="h-1 bg-gradient-to-r from-red-700 via-purple-700 to-black"></div>
       <CardHeader>
         <CardTitle className="text-lg flex items-center">
-          <Plus className="h-5 w-5 mr-1 text-primary" />
-          Add New Expense
+          <div className="bg-gradient-to-r from-red-700 to-black p-1.5 rounded-md mr-2">
+            <Receipt className="h-4 w-4 text-white" />
+          </div>
+          New Expense
         </CardTitle>
-        <CardDescription>Record your new expense here</CardDescription>
+        <CardDescription>Record your expenses to track your spending</CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label htmlFor="amount" className="text-sm font-medium">Amount (₹)</label>
+        <CardContent className="space-y-5">
+          <div className="relative">
+            <label htmlFor="amount" className="text-sm font-medium text-gray-700 mb-1 block">
+              Amount
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <IndianRupeeIcon className="h-5 w-5 text-gray-400" />
+              </div>
               <Input
                 id="amount"
                 type="number"
@@ -81,28 +93,34 @@ const ExpenseForm: React.FC = () => {
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
+                className="pl-10 focus:ring-red-600 focus:border-red-600"
                 required
               />
             </div>
-            <div className="space-y-2">
-              <label htmlFor="category" className="text-sm font-medium">Category</label>
-              <Select value={category} onValueChange={setCategory} required>
-                <SelectTrigger id="category">
-                  <SelectValue placeholder="Select category" />
-                </SelectTrigger>
-                <SelectContent>
-                  {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
           </div>
           
-          <div className="space-y-2">
-            <label htmlFor="date" className="text-sm font-medium">Date</label>
+          <div>
+            <label htmlFor="category" className="text-sm font-medium text-gray-700 mb-1 block">
+              Category
+            </label>
+            <Select value={category} onValueChange={setCategory} required>
+              <SelectTrigger id="category" className="focus:ring-red-600 focus:border-red-600">
+                <SelectValue placeholder="Select expense category" />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.map((cat) => (
+                  <SelectItem key={cat} value={cat}>
+                    {cat}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div>
+            <label htmlFor="date" className="text-sm font-medium text-gray-700 mb-1 block">
+              Date of Expense
+            </label>
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -114,7 +132,7 @@ const ExpenseForm: React.FC = () => {
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                  {date ? format(date, "MMMM d, yyyy") : <span>Select a date</span>}
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0" align="start">
@@ -123,29 +141,54 @@ const ExpenseForm: React.FC = () => {
                   selected={date}
                   onSelect={setDate}
                   initialFocus
+                  className="rounded-md border"
                 />
               </PopoverContent>
             </Popover>
           </div>
           
-          <div className="space-y-2">
-            <label htmlFor="description" className="text-sm font-medium">Description (Optional)</label>
+          <div>
+            <label htmlFor="description" className="text-sm font-medium text-gray-700 mb-1 block">
+              Description (Optional)
+            </label>
             <Textarea
               id="description"
-              placeholder="Add details about your expense"
+              placeholder="What was this expense for?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
+              rows={2}
+              className="resize-none focus:ring-red-600 focus:border-red-600"
             />
           </div>
         </CardContent>
         <CardFooter>
           <Button 
             type="submit" 
-            className="w-full bg-primary hover:bg-primary/90"
-            disabled={loading}
+            className={cn(
+              "w-full transition-all relative",
+              success 
+                ? "bg-green-600 hover:bg-green-700" 
+                : "bg-gradient-to-r from-red-700 to-red-900 hover:opacity-90"
+            )}
+            disabled={loading || success}
           >
-            {loading ? 'Adding...' : 'Add Expense'}
+            {success ? (
+              <span className="flex items-center">
+                <CheckCircle className="mr-2 h-4 w-4" /> Expense Added
+              </span>
+            ) : loading ? (
+              <span className="flex items-center">
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Processing...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <Plus className="mr-2 h-4 w-4" /> Add Expense
+              </span>
+            )}
           </Button>
         </CardFooter>
       </form>
