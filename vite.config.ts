@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
-  base: mode === 'production' ? '/campus-expense-compass/' : '/',
+  base: '/',
   plugins: [
     react(),
     mode === 'development' &&
