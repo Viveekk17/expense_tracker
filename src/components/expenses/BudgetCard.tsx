@@ -3,8 +3,8 @@ import { useExpense } from '../../contexts/ExpenseContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { IndianRupeeIcon, TrendingUp, AlertTriangle } from 'lucide-react';
+import BudgetProgressCircle from './BudgetProgressCircle';
 
 const BudgetCard: React.FC = () => {
   const { userDetails, setMonthlyBudget, totalSpent, remainingBudget } = useExpense();
@@ -58,6 +58,12 @@ const BudgetCard: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-4">
+            <div className="flex justify-center items-center mb-4">
+              <BudgetProgressCircle 
+                budget={userDetails?.monthlyBudget || 0} 
+                expenses={totalSpent} 
+              />
+            </div>
             <div className="flex justify-between items-center">
               <div>
                 <p className="text-xs text-gray-400">Monthly Allowance</p>
