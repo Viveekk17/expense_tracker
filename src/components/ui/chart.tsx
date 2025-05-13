@@ -1,5 +1,29 @@
 import * as React from "react"
-import * as RechartsPrimitive from "recharts"
+import {
+  BarChart as RechartsBarChart,
+  Bar as RechartsBar,
+  XAxis as RechartsXAxis,
+  YAxis as RechartsYAxis,
+  CartesianGrid as RechartsCartesianGrid,
+  Tooltip as RechartsTooltip,
+  ResponsiveContainer as RechartsResponsiveContainer,
+  Cell as RechartsCell,
+  PieChart as RechartsPieChart,
+  Pie as RechartsPie,
+  Legend as RechartsLegend,
+  LineChart as RechartsLineChart,
+  Line as RechartsLine,
+  AreaChart as RechartsAreaChart,
+  Area as RechartsArea,
+  ScatterChart as RechartsScatterChart,
+  Scatter as RechartsScatter,
+  RadarChart as RechartsRadarChart,
+  Radar as RechartsRadar,
+  PolarGrid as RechartsPolarGrid,
+  PolarAngleAxis as RechartsPolarAngleAxis,
+  PolarRadiusAxis as RechartsPolarRadiusAxis,
+  LegendProps as RechartsLegendProps,
+} from "recharts"
 
 import { cn } from "@/lib/utils"
 
@@ -37,7 +61,7 @@ const ChartContainer = React.forwardRef<
   React.ComponentProps<"div"> & {
     config: ChartConfig
     children: React.ComponentProps<
-      typeof RechartsPrimitive.ResponsiveContainer
+      typeof RechartsResponsiveContainer
     >["children"]
   }
 >(({ id, className, children, config, ...props }, ref) => {
@@ -56,9 +80,9 @@ const ChartContainer = React.forwardRef<
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
+        <RechartsResponsiveContainer>
           {children}
-        </RechartsPrimitive.ResponsiveContainer>
+        </RechartsResponsiveContainer>
       </div>
     </ChartContext.Provider>
   )
@@ -98,11 +122,11 @@ ${colorConfig
   )
 }
 
-const ChartTooltip = RechartsPrimitive.Tooltip
+const ChartTooltip = RechartsTooltip
 
 const ChartTooltipContent = React.forwardRef<
   HTMLDivElement,
-  React.ComponentProps<typeof RechartsPrimitive.Tooltip> &
+  React.ComponentProps<typeof RechartsTooltip> &
     React.ComponentProps<"div"> & {
       hideLabel?: boolean
       hideIndicator?: boolean
@@ -254,12 +278,12 @@ const ChartTooltipContent = React.forwardRef<
 )
 ChartTooltipContent.displayName = "ChartTooltip"
 
-const ChartLegend = RechartsPrimitive.Legend
+const ChartLegend = RechartsLegend
 
 const ChartLegendContent = React.forwardRef<
   HTMLDivElement,
   React.ComponentProps<"div"> &
-    Pick<RechartsPrimitive.LegendProps, "payload" | "verticalAlign"> & {
+    Pick<RechartsLegendProps, "payload" | "verticalAlign"> & {
       hideIcon?: boolean
       nameKey?: string
     }
@@ -352,6 +376,29 @@ function getPayloadConfigFromPayload(
     ? config[configLabelKey]
     : config[key as keyof typeof config]
 }
+
+export const BarChart = RechartsBarChart
+export const Bar = RechartsBar
+export const XAxis = RechartsXAxis
+export const YAxis = RechartsYAxis
+export const CartesianGrid = RechartsCartesianGrid
+export const Tooltip = RechartsTooltip
+export const ResponsiveContainer = RechartsResponsiveContainer
+export const Cell = RechartsCell
+export const PieChart = RechartsPieChart
+export const Pie = RechartsPie
+export const Legend = RechartsLegend
+export const LineChart = RechartsLineChart
+export const Line = RechartsLine
+export const AreaChart = RechartsAreaChart
+export const Area = RechartsArea
+export const ScatterChart = RechartsScatterChart
+export const Scatter = RechartsScatter
+export const RadarChart = RechartsRadarChart
+export const Radar = RechartsRadar
+export const PolarGrid = RechartsPolarGrid
+export const PolarAngleAxis = RechartsPolarAngleAxis
+export const PolarRadiusAxis = RechartsPolarRadiusAxis
 
 export {
   ChartContainer,

@@ -3,7 +3,7 @@ import { getCurrentUser } from './awsAuthService';
 
 const API_NAME = 'CampusExpenseCompassAPI';
 
-// Local storage fallback functions
+// Local storage functions
 const saveToLocalStorage = (key: string, data: any) => {
   try {
     localStorage.setItem(key, JSON.stringify(data));
@@ -21,6 +21,17 @@ const getFromLocalStorage = (key: string) => {
   } catch (error) {
     console.error('Error reading from localStorage:', error);
     return null;
+  }
+};
+
+// Sync data from local to AWS in background
+const syncToAWS = async (operation: () => Promise<any>) => {
+  try {
+    await operation();
+    return true;
+  } catch (error) {
+    console.error('Background sync error:', error);
+    return false;
   }
 };
 
@@ -62,9 +73,12 @@ export const createUser = async (email: string): Promise<User> => {
       createdAt: new Date().toISOString()
     };
 
-    console.log('Making API POST request to create user:', newUser);
+    // First save to localStorage for immediate access
+    saveToLocalStorage(`user_${userId}`, newUser);
+    console.log('Created user in localStorage:', newUser);
     
-    try {
+    // Then try AWS in background
+    syncToAWS(async () => {
       const operation = post({
         apiName: API_NAME,
         path: '/users',
@@ -75,22 +89,11 @@ export const createUser = async (email: string): Promise<User> => {
           }
         }
       });
-      
-      console.log('Create user operation created, awaiting response...');
-      const response = await operation.response;
-      console.log('Create user response received:', response);
-      
-      return JSON.parse(JSON.stringify(response.body)) as User;
-    } catch (apiError) {
-      console.error('API call error for creating user:', apiError);
-      console.log('Falling back to localStorage for user creation');
-      
-      // Save to localStorage as fallback
-      saveToLocalStorage(`user_${userId}`, newUser);
-      console.log('Created user in localStorage:', newUser);
-      
-      return newUser;
-    }
+      await operation.response;
+      console.log('User also synced to AWS');
+    });
+    
+    return newUser;
   } catch (error) {
     console.error('Error creating user:', error);
     throw error;
@@ -111,12 +114,28 @@ export const updateUserBudget = async (monthlyBudget: number): Promise<User> => 
     const userId = currentUser.username;
     console.log('Using userId:', userId);
     
-    console.log('Making API PUT request to:', `/users/${userId}`);
-    console.log('Request body:', { monthlyBudget });
-    console.log('Using API name:', API_NAME);
+    // First update in localStorage
+    const userKey = `user_${userId}`;
+    let userData = getFromLocalStorage(userKey) as User | null;
     
-    // Try adding the content type explicitly
-    try {
+    if (!userData) {
+      // Create new user data if it doesn't exist
+      userData = {
+        userId,
+        email: currentUser.signInDetails?.loginId || `${userId}@example.com`,
+        monthlyBudget,
+        createdAt: new Date().toISOString()
+      };
+    } else {
+      // Update existing user data
+      userData.monthlyBudget = monthlyBudget;
+    }
+    
+    saveToLocalStorage(userKey, userData);
+    console.log('Updated user budget in localStorage:', userData);
+    
+    // Then sync to AWS in background
+    syncToAWS(async () => {
       const operation = put({
         apiName: API_NAME,
         path: `/users/${userId}`,
@@ -127,48 +146,13 @@ export const updateUserBudget = async (monthlyBudget: number): Promise<User> => 
           }
         }
       });
-      
-      console.log('Operation created, awaiting response...');
-      const response = await operation.response;
-      console.log('Response received:', response);
-      
-      if (!response.body) {
-        throw new Error('No response body received from API');
-      }
-      
-      return JSON.parse(JSON.stringify(response.body)) as User;
-    } catch (apiError) {
-      console.error('API call error:', apiError);
-      console.log('Falling back to localStorage for budget update');
-      
-      // Fallback to localStorage
-      const userKey = `user_${userId}`;
-      let userData = getFromLocalStorage(userKey) as User | null;
-      
-      if (!userData) {
-        // Create new user data if it doesn't exist
-        userData = {
-          userId,
-          email: currentUser.signInDetails?.loginId || `${userId}@example.com`,
-          monthlyBudget,
-          createdAt: new Date().toISOString()
-        };
-      } else {
-        // Update existing user data
-        userData.monthlyBudget = monthlyBudget;
-      }
-      
-      saveToLocalStorage(userKey, userData);
-      console.log('Updated user budget in localStorage:', userData);
-      return userData;
-    }
+      await operation.response;
+      console.log('Budget also synced to AWS');
+    });
+    
+    return userData;
   } catch (error) {
-    console.error('Detailed error updating user budget:', error);
-    if (error instanceof Error) {
-      console.error('Error name:', error.name);
-      console.error('Error message:', error.message);
-      console.error('Error stack:', error.stack);
-    }
+    console.error('Error updating user budget:', error);
     throw error;
   }
 };
@@ -188,8 +172,36 @@ export const getUserDetails = async (): Promise<User | null> => {
     const userId = currentUser.username;
     console.log('Using userId for details:', userId);
     
-    console.log('Making API GET request for user details:', `/users/${userId}`);
+    // First check localStorage
+    const userData = getFromLocalStorage(`user_${userId}`) as User | null;
+    if (userData) {
+      console.log('Found user data in localStorage:', userData);
+      
+      // Fetch from AWS in background to keep data fresh
+      syncToAWS(async () => {
+        const operation = get({
+          apiName: API_NAME,
+          path: `/users/${userId}`,
+          options: {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        });
+        
+        const response = await operation.response;
+        if (response.body) {
+          const awsUserData = JSON.parse(JSON.stringify(response.body)) as User;
+          saveToLocalStorage(`user_${userId}`, awsUserData);
+          console.log('Updated user data from AWS in background');
+        }
+      });
+      
+      return userData;
+    }
     
+    // If not in local storage, try AWS
+    console.log('No data in localStorage, trying AWS API...');
     try {
       const operation = get({
         apiName: API_NAME,
@@ -207,25 +219,15 @@ export const getUserDetails = async (): Promise<User | null> => {
       
       if (!response.body) {
         console.log('No user details found in response');
-        throw new Error('No user details found in API response');
+        return null;
       }
       
-      const userData = JSON.parse(JSON.stringify(response.body)) as User;
-      // Also save to localStorage for offline access
-      saveToLocalStorage(`user_${userId}`, userData);
-      return userData;
+      const fetchedUserData = JSON.parse(JSON.stringify(response.body)) as User;
+      // Save to localStorage for future access
+      saveToLocalStorage(`user_${userId}`, fetchedUserData);
+      return fetchedUserData;
     } catch (apiError) {
       console.error('API call error for user details:', apiError);
-      console.log('Checking localStorage for user data');
-      
-      // Try localStorage
-      const userData = getFromLocalStorage(`user_${userId}`) as User | null;
-      if (userData) {
-        console.log('Found user data in localStorage:', userData);
-        return userData;
-      }
-      
-      console.log('No user data found in localStorage either. Returning null.');
       return null;
     }
   } catch (error) {
@@ -256,9 +258,15 @@ export const addExpense = async (expense: Omit<Expense, 'userId' | 'expenseId'>)
       expenseId
     };
 
-    console.log('Making API POST request to add expense:', newExpense);
+    // First save to localStorage for immediate access
+    const expensesKey = `expenses_${userId}`;
+    const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
+    existingExpenses.push(newExpense);
+    saveToLocalStorage(expensesKey, existingExpenses);
+    console.log('Added expense to localStorage:', newExpense);
     
-    try {
+    // Then sync to AWS in background
+    syncToAWS(async () => {
       const operation = post({
         apiName: API_NAME,
         path: '/expenses',
@@ -269,31 +277,11 @@ export const addExpense = async (expense: Omit<Expense, 'userId' | 'expenseId'>)
           }
         }
       });
-      
-      console.log('Expense operation created, awaiting response...');
-      const response = await operation.response;
-      console.log('Expense response received:', response);
-      
-      if (!response.body) {
-        throw new Error('No response body received from API');
-      }
-      
-      return JSON.parse(JSON.stringify(response.body)) as Expense;
-    } catch (apiError) {
-      console.error('API call error for expense:', apiError);
-      console.log('Falling back to localStorage for expense tracking');
-      
-      // Fallback to localStorage
-      const expensesKey = `expenses_${userId}`;
-      const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
-      
-      // Add the new expense
-      existingExpenses.push(newExpense);
-      saveToLocalStorage(expensesKey, existingExpenses);
-      
-      console.log('Added expense to localStorage:', newExpense);
-      return newExpense;
-    }
+      await operation.response;
+      console.log('Expense also synced to AWS');
+    });
+    
+    return newExpense;
   } catch (error) {
     console.error('Error adding expense:', error);
     throw error;
@@ -315,8 +303,36 @@ export const getExpenses = async (): Promise<Expense[]> => {
     const userId = currentUser.username;
     console.log('Using userId for expense list:', userId);
     
-    console.log('Making API GET request for expenses:', `/expenses/user/${userId}`);
+    // First check localStorage
+    const expensesData = getFromLocalStorage(`expenses_${userId}`) as Expense[] | null;
+    if (expensesData) {
+      console.log('Found expenses data in localStorage:', expensesData);
+      
+      // Fetch from AWS in background to keep data fresh
+      syncToAWS(async () => {
+        const operation = get({
+          apiName: API_NAME,
+          path: `/expenses/user/${userId}`,
+          options: {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        });
+        
+        const response = await operation.response;
+        if (response.body) {
+          const awsExpenses = JSON.parse(JSON.stringify(response.body)) as Expense[];
+          saveToLocalStorage(`expenses_${userId}`, awsExpenses);
+          console.log('Updated expenses from AWS in background');
+        }
+      });
+      
+      return expensesData;
+    }
     
+    // If not in local storage, try AWS
+    console.log('No data in localStorage, trying AWS API...');
     try {
       const operation = get({
         apiName: API_NAME,
@@ -334,25 +350,15 @@ export const getExpenses = async (): Promise<Expense[]> => {
       
       if (!response.body) {
         console.log('No expenses found in response');
-        throw new Error('No expenses data in API response');
+        return [];
       }
       
       const expenses = JSON.parse(JSON.stringify(response.body)) as Expense[];
-      // Also save to localStorage for offline access
+      // Save to localStorage for future access
       saveToLocalStorage(`expenses_${userId}`, expenses);
       return expenses;
     } catch (apiError) {
       console.error('API call error for expenses list:', apiError);
-      console.log('Checking localStorage for expenses data');
-      
-      // Try localStorage
-      const expensesData = getFromLocalStorage(`expenses_${userId}`) as Expense[] | null;
-      if (expensesData) {
-        console.log('Found expenses data in localStorage:', expensesData);
-        return expensesData;
-      }
-      
-      console.log('No expenses data found in localStorage either. Returning empty array.');
       return [];
     }
   } catch (error) {
@@ -371,8 +377,37 @@ export const generateReportUrl = async (): Promise<string> => {
     const userId = currentUser.username;
     console.log('Generating report for user:', userId);
     
-    try {
-      // Try the API first
+    // Generate CSV from local storage first for speed
+    const expenses = getFromLocalStorage(`expenses_${userId}`) as Expense[] || [];
+    
+    // Add BOM for Excel to correctly identify UTF-8
+    const BOM = '\uFEFF';
+    // Generate CSV content - Excel needs a specific date format
+    const headers = 'Date,Amount,Category,Description\n';
+    
+    // Format dates properly for Excel - using numbers with slashes
+    const rows = expenses.map(expense => {
+      let formattedDate = '';
+      try {
+        const date = new Date(expense.date);
+        // Format as MM/DD/YYYY without quotes, which Excel recognizes as a date
+        formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
+      } catch (e) {
+        console.error('Date formatting error:', e);
+        formattedDate = expense.date; // fallback
+      }
+      
+      return `${formattedDate},${expense.amount},${expense.category},"${expense.description || ''}"`;
+    }).join('\n');
+    
+    const csvContent = BOM + headers + rows;
+    
+    // Create a blob with specific type for Excel
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    
+    // Try AWS in background but don't wait for it
+    syncToAWS(async () => {
       const operation = get({
         apiName: API_NAME,
         path: `/reports/${userId}`,
@@ -382,50 +417,11 @@ export const generateReportUrl = async (): Promise<string> => {
           }
         }
       });
-      
-      console.log('Report operation created, awaiting response...');
-      const response = await operation.response;
-      console.log('Report response received:', response);
-      
-      const data = JSON.parse(JSON.stringify(response.body)) as { url: string };
-      return data.url;
-    } catch (apiError) {
-      console.error('API call error for report:', apiError);
-      console.log('Falling back to local CSV generation');
-      
-      // Fallback to local CSV generation
-      // Generate CSV content from local storage expenses
-      const expenses = getFromLocalStorage(`expenses_${userId}`) as Expense[] || [];
-      
-      // Add BOM for Excel to correctly identify UTF-8
-      const BOM = '\uFEFF';
-      // Generate CSV content - Excel needs a specific date format
-      const headers = 'Date,Amount,Category,Description\n';
-      
-      // Format dates properly for Excel - using numbers with slashes
-      const rows = expenses.map(expense => {
-        let formattedDate = '';
-        try {
-          const date = new Date(expense.date);
-          // Format as MM/DD/YYYY without quotes, which Excel recognizes as a date
-          formattedDate = `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}/${date.getFullYear()}`;
-        } catch (e) {
-          console.error('Date formatting error:', e);
-          formattedDate = expense.date; // fallback
-        }
-        
-        return `${formattedDate},${expense.amount},${expense.category},"${expense.description || ''}"`;
-      }).join('\n');
-      
-      const csvContent = BOM + headers + rows;
-      
-      // Create a blob with specific type for Excel
-      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
-      
-      // Return the local URL
-      return url;
-    }
+      await operation.response;
+    });
+    
+    // Return the local URL immediately
+    return url;
   } catch (error) {
     console.error('Error generating report:', error);
     throw error;
@@ -446,7 +442,15 @@ export const deleteExpense = async (expenseId: string): Promise<void> => {
     const userId = currentUser.username;
     console.log('Using userId for expense deletion:', userId);
     
-    try {
+    // First delete from localStorage
+    const expensesKey = `expenses_${userId}`;
+    const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
+    const updatedExpenses = existingExpenses.filter(exp => exp.expenseId !== expenseId);
+    saveToLocalStorage(expensesKey, updatedExpenses);
+    console.log('Deleted expense from localStorage');
+    
+    // Then sync to AWS in background
+    syncToAWS(async () => {
       const operation = del({
         apiName: API_NAME,
         path: `/expenses/${expenseId}`,
@@ -456,30 +460,9 @@ export const deleteExpense = async (expenseId: string): Promise<void> => {
           }
         }
       });
-      
-      console.log('Delete expense operation created, awaiting response...');
-      const response = await operation.response;
-      console.log('Delete expense response received:', response);
-      
-      // Also remove from localStorage
-      const expensesKey = `expenses_${userId}`;
-      const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
-      const updatedExpenses = existingExpenses.filter(exp => exp.expenseId !== expenseId);
-      saveToLocalStorage(expensesKey, updatedExpenses);
-      
-      console.log('Expense deleted successfully');
-    } catch (apiError) {
-      console.error('API call error for expense deletion:', apiError);
-      console.log('Falling back to localStorage for expense deletion');
-      
-      // Fallback to localStorage
-      const expensesKey = `expenses_${userId}`;
-      const existingExpenses = getFromLocalStorage(expensesKey) as Expense[] || [];
-      const updatedExpenses = existingExpenses.filter(exp => exp.expenseId !== expenseId);
-      saveToLocalStorage(expensesKey, updatedExpenses);
-      
-      console.log('Deleted expense from localStorage');
-    }
+      await operation.response;
+      console.log('Expense deletion also synced to AWS');
+    });
   } catch (error) {
     console.error('Error deleting expense:', error);
     throw error;

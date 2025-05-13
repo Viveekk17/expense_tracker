@@ -1,16 +1,20 @@
-import React from 'react';
+import React, { useState } from 'react';
 import AppLayout from '../components/layout/AppLayout';
 import BudgetCard from '../components/expenses/BudgetCard';
 import ExpenseForm from '../components/expenses/ExpenseForm';
 import ExpenseTable from '../components/expenses/ExpenseTable';
-import DashboardStats from '../components/expenses/DashboardStats';
+import { DashboardStats } from '../components/expenses/DashboardStats';
+import { ExpenseAnalytics } from '../components/expenses/ExpenseAnalytics';
 import { useExpense } from '../contexts/ExpenseContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { BarChart, PieChart, Calendar, Wallet, TrendingUp, AlertCircle } from 'lucide-react';
+import { BarChart, PieChart, Calendar, Wallet, TrendingUp, AlertCircle, LayoutDashboard } from 'lucide-react';
+import { Button } from '../components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 
 const Dashboard = () => {
   const { isLoading } = useExpense();
   const { theme } = useTheme();
+  const [activeTab, setActiveTab] = useState<string>('dashboard');
   
   if (isLoading) {
     return (
@@ -40,75 +44,93 @@ const Dashboard = () => {
               <p className="dashboard-subtitle text-lg">Track and manage your campus expenses</p>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2 bg-primary/10 dark:bg-primary/20 px-4 py-2 rounded-lg">
-                <Wallet className="h-5 w-5 text-primary" />
-                <span className="text-primary font-medium">Student Budget</span>
-              </div>
+              <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="grid grid-cols-2 w-[300px]">
+                  <TabsTrigger value="dashboard" className="flex items-center space-x-2">
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>Dashboard</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="analytics" className="flex items-center space-x-2">
+                    <BarChart className="h-4 w-4" />
+                    <span>Analytics</span>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </div>
           </div>
         </div>
         
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left Column */}
-          <div className="space-y-8">
-            <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Budget Overview</h2>
-                  <div className="dashboard-badge">
-                    <TrendingUp className="h-4 w-4 mr-1 inline" />
-                    Monthly
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-8">
+          <TabsContent value="dashboard" className="space-y-8 m-0">
+            {/* Main Content Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {/* Left Column */}
+              <div className="space-y-8">
+                <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Budget Overview</h2>
+                      <div className="dashboard-badge">
+                        <TrendingUp className="h-4 w-4 mr-1 inline" />
+                        Monthly
+                      </div>
+                    </div>
+                    <BudgetCard />
                   </div>
                 </div>
-                <BudgetCard />
+                
+                <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Expense Analytics</h2>
+                      <div className="dashboard-badge">
+                        <PieChart className="h-4 w-4 mr-1 inline" />
+                        Statistics
+                      </div>
+                    </div>
+                    <DashboardStats />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Right Column */}
+              <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
+                <div className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Add New Expense</h2>
+                    <div className="dashboard-badge">
+                      <AlertCircle className="h-4 w-4 mr-1 inline" />
+                      Quick Add
+                    </div>
+                  </div>
+                  <ExpenseForm />
+                </div>
               </div>
             </div>
             
-            <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
+            {/* Expense History Section */}
+            <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
               <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Expense Analytics</h2>
-                  <div className="dashboard-badge">
-                    <PieChart className="h-4 w-4 mr-1 inline" />
-                    Statistics
+                <div className="flex items-center justify-between mb-6">
+                  <div className="flex items-center space-x-3">
+                    <Calendar className="h-6 w-6 text-primary" />
+                    <h2 className="text-2xl font-semibold text-card-foreground dark:text-gray-200">Expense History</h2>
+                  </div>
+                  <div className="dashboard-badge text-base px-4 py-2">
+                    All transactions
                   </div>
                 </div>
-                <DashboardStats />
+                <ExpenseTable />
               </div>
             </div>
-          </div>
+          </TabsContent>
           
-          {/* Right Column */}
-          <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300 bg-white dark:bg-gray-800/50">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-semibold text-card-foreground dark:text-gray-200">Add New Expense</h2>
-                <div className="dashboard-badge">
-                  <AlertCircle className="h-4 w-4 mr-1 inline" />
-                  Quick Add
-                </div>
-              </div>
-              <ExpenseForm />
+          <TabsContent value="analytics" className="m-0">
+            <div className="dashboard-card bg-white dark:bg-gray-800/50 p-6">
+              <ExpenseAnalytics />
             </div>
-          </div>
-        </div>
-        
-        {/* Expense History Section */}
-        <div className="dashboard-card transform hover:scale-[1.02] transition-all duration-300">
-          <div className="p-6">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-3">
-                <Calendar className="h-6 w-6 text-primary" />
-                <h2 className="text-2xl font-semibold text-card-foreground dark:text-gray-200">Expense History</h2>
-              </div>
-              <div className="dashboard-badge text-base px-4 py-2">
-                All transactions
-              </div>
-            </div>
-            <ExpenseTable />
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </div>
     </AppLayout>
   );
