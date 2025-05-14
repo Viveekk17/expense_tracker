@@ -89,13 +89,18 @@ export default {
 				scaleIn: {
 					'0%': { opacity: '0', transform: 'scale(0.95)' },
 					'100%': { opacity: '1', transform: 'scale(1)' }
+				},
+				spinSlow: {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
 				}
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
 				"fadeIn": "fadeIn 0.6s ease-out forwards",
-				"scaleIn": "scaleIn 0.5s ease-out 0.2s forwards"
+				"scaleIn": "scaleIn 0.5s ease-out 0.2s forwards",
+				"spin-slow": "spinSlow 1.5s ease-in-out"
 			},
 		},
 	},

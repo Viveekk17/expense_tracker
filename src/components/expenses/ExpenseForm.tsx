@@ -23,6 +23,7 @@ import { format } from 'date-fns';
 import { CalendarIcon, Plus, IndianRupeeIcon, Receipt, CheckCircle } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const ExpenseForm: React.FC = () => {
   const [amount, setAmount] = useState('');
@@ -31,20 +32,52 @@ const ExpenseForm: React.FC = () => {
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [errors, setErrors] = useState<{
+    amount?: string;
+    category?: string;
+    date?: string;
+  }>({});
   
   const { categories, addExpense } = useExpense();
+  const { toast } = useToast();
+
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+    
+    if (!amount || Number(amount) <= 0) {
+      newErrors.amount = 'Please enter a valid amount';
+    }
+    
+    if (!category) {
+      newErrors.category = 'Please select a category';
+    }
+    
+    if (!date) {
+      newErrors.date = 'Please select a date';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!amount || !category || !date) return;
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields correctly",
+        variant: "destructive",
+      });
+      return;
+    }
     
     try {
       setLoading(true);
       await addExpense({
         amount: Number(amount),
         category,
-        date: format(date, 'yyyy-MM-dd'),
+        date: format(date!, 'yyyy-MM-dd'),
         description
       });
       
@@ -57,8 +90,14 @@ const ExpenseForm: React.FC = () => {
       setCategory('');
       setDate(new Date());
       setDescription('');
+      setErrors({});
     } catch (error) {
       console.error('Failed to add expense:', error);
+      toast({
+        title: "Error",
+        description: "Failed to add expense. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -92,19 +131,45 @@ const ExpenseForm: React.FC = () => {
                 step="0.01"
                 placeholder="0.00"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                className="pl-10 focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
+                onChange={(e) => {
+                  setAmount(e.target.value);
+                  if (errors.amount) {
+                    setErrors(prev => ({ ...prev, amount: undefined }));
+                  }
+                }}
+                className={cn(
+                  "pl-10 focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700",
+                  errors.amount && "border-red-500 focus:border-red-500 focus:ring-red-500"
+                )}
                 required
               />
             </div>
+            {errors.amount && (
+              <p className="mt-1 text-sm text-red-500">{errors.amount}</p>
+            )}
           </div>
           
           <div>
             <label htmlFor="category" className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
               Category
             </label>
-            <Select value={category} onValueChange={setCategory} required>
-              <SelectTrigger id="category" className="focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700">
+            <Select 
+              value={category} 
+              onValueChange={(value) => {
+                setCategory(value);
+                if (errors.category) {
+                  setErrors(prev => ({ ...prev, category: undefined }));
+                }
+              }}
+              required
+            >
+              <SelectTrigger 
+                id="category" 
+                className={cn(
+                  "focus:ring-red-600 focus:border-red-600 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700",
+                  errors.category && "border-red-500 focus:border-red-500 focus:ring-red-500"
+                )}
+              >
                 <SelectValue placeholder="Select expense category" />
               </SelectTrigger>
               <SelectContent>
@@ -115,6 +180,9 @@ const ExpenseForm: React.FC = () => {
                 ))}
               </SelectContent>
             </Select>
+            {errors.category && (
+              <p className="mt-1 text-sm text-red-500">{errors.category}</p>
+            )}
           </div>
           
           <div>
@@ -128,7 +196,8 @@ const ExpenseForm: React.FC = () => {
                   variant={"outline"}
                   className={cn(
                     "w-full justify-start text-left font-normal dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700",
-                    !date && "text-muted-foreground"
+                    !date && "text-muted-foreground",
+                    errors.date && "border-red-500 focus:border-red-500 focus:ring-red-500"
                   )}
                 >
                   <CalendarIcon className="mr-2 h-4 w-4" />
@@ -139,12 +208,20 @@ const ExpenseForm: React.FC = () => {
                 <Calendar
                   mode="single"
                   selected={date}
-                  onSelect={setDate}
+                  onSelect={(newDate) => {
+                    setDate(newDate);
+                    if (errors.date) {
+                      setErrors(prev => ({ ...prev, date: undefined }));
+                    }
+                  }}
                   initialFocus
                   className="rounded-md border dark:bg-gray-900 dark:text-gray-200"
                 />
               </PopoverContent>
             </Popover>
+            {errors.date && (
+              <p className="mt-1 text-sm text-red-500">{errors.date}</p>
+            )}
           </div>
           
           <div>

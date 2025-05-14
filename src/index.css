@@ -128,4 +128,27 @@
   .dashboard-badge {
     @apply px-3 py-1.5 bg-primary/10 dark:bg-primary/20 text-primary text-sm rounded-full font-medium;
   }
+
+  @keyframes fadeInOut {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -20px);
+    }
+    20% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    80% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -20px);
+    }
+  }
+
+  .animate-fade-in-out {
+    animation: fadeInOut 2.5s ease-in-out forwards;
+  }
 }

@@ -39,6 +39,7 @@ export function DashboardStats() {
   const [categorySummary, setCategorySummary] = useState<CategorySummary[]>([])
   const [monthlyTrend, setMonthlyTrend] = useState<MonthlyTrend[]>([])
   const [insightsMessage, setInsightsMessage] = useState<string>('')
+  const [activeView, setActiveView] = useState<'pie' | 'bar'>('pie')
 
   useEffect(() => {
     if (expenses.length > 0) {
@@ -62,7 +63,7 @@ export function DashboardStats() {
       .map(([category, amount]) => ({
         category,
         amount,
-        percentage: Math.round((amount / totalSpent) * 100)
+        percentage: totalSpent > 0 ? Math.round((amount / totalSpent) * 100) : 0
       }))
       .sort((a, b) => b.amount - a.amount)
     
@@ -70,34 +71,24 @@ export function DashboardStats() {
   }
 
   const generateMonthlyTrend = () => {
-    const monthMap = new Map<string, number>()
+    const monthlyData = new Map<string, number>()
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     
-    // Get the last 6 months as labels
-    const months = []
-    const today = new Date()
-    for (let i = 5; i >= 0; i--) {
-      const d = new Date(today.getFullYear(), today.getMonth() - i, 1)
-      const monthLabel = d.toLocaleString('default', { month: 'short', year: '2-digit' })
-      monthMap.set(monthLabel, 0)
-      months.push(monthLabel)
-    }
+    // Initialize all months with 0
+    months.forEach(month => monthlyData.set(month, 0))
     
     // Sum up expenses by month
     expenses.forEach(expense => {
       const date = new Date(expense.date)
-      const monthLabel = date.toLocaleString('default', { month: 'short', year: '2-digit' })
-      
-      // Only include expenses from the last 6 months
-      if (months.includes(monthLabel)) {
-        const currentTotal = monthMap.get(monthLabel) || 0
-        monthMap.set(monthLabel, currentTotal + expense.amount)
-      }
+      const month = months[date.getMonth()]
+      const currentTotal = monthlyData.get(month) || 0
+      monthlyData.set(month, currentTotal + expense.amount)
     })
     
-    // Convert to array sorted by month chronologically
+    // Convert to array and sort by month
     const trend: MonthlyTrend[] = months.map(month => ({
       month,
-      amount: monthMap.get(month) || 0
+      amount: monthlyData.get(month) || 0
     }))
     
     setMonthlyTrend(trend)
@@ -237,41 +228,105 @@ export function DashboardStats() {
                   <TabsContent value="category" className="mt-4">
                     <div className="h-[300px] w-full bg-[#192031] rounded-lg p-4 shadow-sm">
                       {categorySummary.length > 0 ? (
-                        <ResponsiveContainer width="100%" height="100%">
-                          <BarChart
-                            layout="vertical"
-                            data={categorySummary.slice(0, 10)}
-                            margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
-                          >
-                            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
-                            <XAxis type="number" tickFormatter={(value) => `₹${value}`} stroke="#94a3b8" />
-                            <YAxis 
-                              type="category" 
-                              dataKey="category" 
-                              tick={{ fontSize: 12 }} 
-                              width={90}
-                              stroke="#94a3b8"
-                            />
-                            <Tooltip 
-                              formatter={(value) => [`₹${value}`, 'Amount']}
-                              labelFormatter={(value) => `Category: ${value}`}
-                              contentStyle={{ backgroundColor: '#192031', borderColor: '#334155' }}
-                              itemStyle={{ color: '#e2e8f0' }}
-                              labelStyle={{ color: '#e2e8f0' }}
-                            />
-                            <Bar 
-                              dataKey="amount"
-                              animationBegin={0}
-                              animationDuration={1200}
-                              animationEasing="ease-in-out"
-                              radius={[0, 4, 4, 0]}
+                        <div className="h-full">
+                          <div className="flex justify-end mb-4">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => setActiveView(activeView === 'pie' ? 'bar' : 'pie')}
+                              className="text-primary hover:text-primary/80"
                             >
-                              {categorySummary.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Bar>
-                          </BarChart>
-                        </ResponsiveContainer>
+                              {activeView === 'pie' ? 'Show Bar Chart' : 'Show Pie Chart'}
+                            </Button>
+                          </div>
+                          <ResponsiveContainer width="100%" height="100%">
+                            {activeView === 'pie' ? (
+                              <RechartsPieChart>
+                                <Pie
+                                  data={categorySummary}
+                                  cx="50%"
+                                  cy="50%"
+                                  innerRadius={60}
+                                  outerRadius={80}
+                                  paddingAngle={5}
+                                  dataKey="amount"
+                                  animationBegin={0}
+                                  animationDuration={1200}
+                                  animationEasing="ease-in-out"
+                                >
+                                  {categorySummary.map((entry, index) => (
+                                    <Cell 
+                                      key={`cell-${index}`} 
+                                      fill={COLORS[index % COLORS.length]}
+                                      stroke="#1a2234"
+                                      strokeWidth={2}
+                                    />
+                                  ))}
+                                </Pie>
+                                <Tooltip
+                                  formatter={(value: number) => [`₹${value}`, 'Amount']}
+                                  contentStyle={{ 
+                                    backgroundColor: '#192031', 
+                                    borderColor: '#334155',
+                                    borderRadius: '8px',
+                                    padding: '8px'
+                                  }}
+                                  itemStyle={{ color: '#e2e8f0' }}
+                                  labelStyle={{ color: '#e2e8f0' }}
+                                />
+                                <Legend
+                                  layout="vertical"
+                                  align="right"
+                                  verticalAlign="middle"
+                                  formatter={(value, entry: any) => (
+                                    <span className="text-gray-300 text-sm">
+                                      {value} ({entry.payload.percentage}%)
+                                    </span>
+                                  )}
+                                />
+                              </RechartsPieChart>
+                            ) : (
+                              <BarChart
+                                layout="vertical"
+                                data={categorySummary.slice(0, 10)}
+                                margin={{ top: 5, right: 30, left: 40, bottom: 5 }}
+                              >
+                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
+                                <XAxis type="number" tickFormatter={(value) => `₹${value}`} stroke="#94a3b8" />
+                                <YAxis 
+                                  type="category" 
+                                  dataKey="category" 
+                                  tick={{ fontSize: 12 }} 
+                                  width={90}
+                                  stroke="#94a3b8"
+                                />
+                                <Tooltip 
+                                  formatter={(value) => [`₹${value}`, 'Amount']}
+                                  labelFormatter={(value) => `Category: ${value}`}
+                                  contentStyle={{ 
+                                    backgroundColor: '#192031', 
+                                    borderColor: '#334155',
+                                    borderRadius: '8px',
+                                    padding: '8px'
+                                  }}
+                                  itemStyle={{ color: '#e2e8f0' }}
+                                  labelStyle={{ color: '#e2e8f0' }}
+                                />
+                                <Bar 
+                                  dataKey="amount"
+                                  animationBegin={0}
+                                  animationDuration={1200}
+                                  animationEasing="ease-in-out"
+                                  radius={[0, 4, 4, 0]}
+                                >
+                                  {categorySummary.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                  ))}
+                                </Bar>
+                              </BarChart>
+                            )}
+                          </ResponsiveContainer>
+                        </div>
                       ) : (
                         <div className="flex h-full items-center justify-center">
                           <p className="text-center text-gray-400">
@@ -295,7 +350,12 @@ export function DashboardStats() {
                             <Tooltip 
                               formatter={(value) => [`₹${value}`, 'Amount']}
                               labelFormatter={(value) => `Month: ${value}`}
-                              contentStyle={{ backgroundColor: '#192031', borderColor: '#334155' }}
+                              contentStyle={{ 
+                                backgroundColor: '#192031', 
+                                borderColor: '#334155',
+                                borderRadius: '8px',
+                                padding: '8px'
+                              }}
                               itemStyle={{ color: '#e2e8f0' }}
                               labelStyle={{ color: '#e2e8f0' }}
                             />
@@ -306,7 +366,7 @@ export function DashboardStats() {
                               animationBegin={0}
                               animationDuration={1200}
                               animationEasing="ease-in-out"
-                              radius={[0, 4, 4, 0]}
+                              radius={[4, 4, 0, 0]}
                             />
                           </BarChart>
                         </ResponsiveContainer>
@@ -333,14 +393,7 @@ export function DashboardStats() {
               <span className="text-xs font-semibold text-amber-400">INSIGHT</span>
             </div>
             <p className="text-sm text-gray-300 line-clamp-3">
-              Your highest spending is on{' '}
-              <span className="text-white">
-                {categorySummary.length > 0 ? categorySummary[0].category : 'Food'}
-              </span>
-              {categorySummary.length > 0 ? 
-                ` (${categorySummary[0].percentage}% of total)` : ''}
-              {userDetails?.monthlyBudget ? 
-                `. Note: You've used ${Math.round((totalSpent / userDetails.monthlyBudget) * 100)}% of your monthly budget.` : '.'}
+              {insightsMessage || 'Add more expenses to generate personalized spending insights.'}
             </p>
           </CardContent>
         </Card>

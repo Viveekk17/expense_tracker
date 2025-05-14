@@ -131,7 +131,7 @@ export const ExpenseProvider: React.FC<{ children: React.ReactNode }> = ({ child
       } catch (error: any) {
         toast({
           title: "Error loading data",
-          description: error.message,
+          description: error.message || "Failed to load data. Please try again.",
           variant: "destructive",
         });
         console.error("Error fetching data:", error);

@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { IndianRupeeIcon, TrendingUp, AlertTriangle } from 'lucide-react';
 import BudgetProgressCircle from './BudgetProgressCircle';
+import { toast } from '@/components/ui/use-toast';
 
 const BudgetCard: React.FC = () => {
   const { userDetails, setMonthlyBudget, totalSpent, remainingBudget } = useExpense();
@@ -12,10 +13,26 @@ const BudgetCard: React.FC = () => {
   const [isEditing, setIsEditing] = useState(!userDetails?.monthlyBudget);
 
   const handleSaveBudget = async () => {
-    if (!budget || isNaN(Number(budget)) || Number(budget) <= 0) return;
+    if (!budget || isNaN(Number(budget)) || Number(budget) <= 0) {
+      toast({
+        title: "Invalid Budget",
+        description: "Please enter a valid budget amount greater than 0.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    await setMonthlyBudget(Number(budget));
-    setIsEditing(false);
+    try {
+      await setMonthlyBudget(Number(budget));
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Error saving budget:', error);
+      toast({
+        title: "Error Saving Budget",
+        description: "Failed to save budget. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const percentSpent = userDetails?.monthlyBudget 
