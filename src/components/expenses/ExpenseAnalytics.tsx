@@ -64,14 +64,21 @@ export function ExpenseAnalytics() {
   }
 
   useEffect(() => {
-    if (expenses.length > 0) {
-      generateCategorySummary()
-      generateDailySpending()
-      generateInsights()
-      // Force rerender of pie chart when expenses change
-      setPieKey(Date.now())
-    }
+    generateCategorySummary()
+    generateDailySpending()
+    // Force rerender of pie chart when expenses change
+    setPieKey(Date.now())
   }, [expenses, totalSpent, remainingBudget, userDetails])
+
+  useEffect(() => {
+    generateInsights()
+  }, [expenses, categorySummary, dailySpending, totalSpent, remainingBudget, userDetails])
+
+  // Add a separate effect for initial load
+  useEffect(() => {
+    // Set initial tab to insights
+    setActiveTab('insights')
+  }, [])
 
   const generateCategorySummary = () => {
     const categoryMap = new Map<string, number>()
@@ -132,183 +139,193 @@ export function ExpenseAnalytics() {
   const generateInsights = () => {
     const newInsights: TrendInsight[] = []
     
-    // Budget status and projections
-    if (userDetails && userDetails.monthlyBudget > 0) {
-      const budgetUsedPercentage = Math.round((totalSpent / userDetails.monthlyBudget) * 100)
-      const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
-      const currentDay = new Date().getDate()
-      const expectedSpendByNow = (userDetails.monthlyBudget / daysInMonth) * currentDay
-      const spendingRate = totalSpent / currentDay
-      const projectedMonthly = spendingRate * daysInMonth
+    // Add welcome insight if there are no expenses
+    if (expenses.length === 0) {
+      newInsights.push({
+        type: 'info',
+        title: 'Welcome to Expense Analytics',
+        description: 'Start adding your expenses to get personalized insights and recommendations for better financial management.',
+        sentiment: 'neutral',
+      })
+    } else {
+      // Budget status and projections
+      if (userDetails && userDetails.monthlyBudget > 0) {
+        const budgetUsedPercentage = Math.round((totalSpent / userDetails.monthlyBudget) * 100)
+        const daysInMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate()
+        const currentDay = new Date().getDate()
+        const expectedSpendByNow = (userDetails.monthlyBudget / daysInMonth) * currentDay
+        const spendingRate = totalSpent / currentDay
+        const projectedMonthly = spendingRate * daysInMonth
 
-      if (budgetUsedPercentage > 90) {
-        newInsights.push({
-          type: 'warning',
-          title: 'Budget Alert',
-          description: `You've used ${budgetUsedPercentage}% of your monthly budget. At this rate, you'll exceed your budget by ₹${Math.abs(projectedMonthly - userDetails.monthlyBudget).toLocaleString()}.`,
-          sentiment: 'negative',
-        })
-      } else if (budgetUsedPercentage > 70) {
-        newInsights.push({
-          type: 'info',
-          title: 'Budget Status',
-          description: `You've used ${budgetUsedPercentage}% of your monthly budget. You're spending ₹${spendingRate.toLocaleString()} per day on average.`,
-          sentiment: 'neutral',
-        })
-      } else if (budgetUsedPercentage <= 70) {
-        newInsights.push({
-          type: 'success',
-          title: 'Budget On Track',
-          description: `You've only used ${budgetUsedPercentage}% of your monthly budget. You're ₹${(expectedSpendByNow - totalSpent).toLocaleString()} below expected spending!`,
-          sentiment: 'positive',
-        })
-      }
-    }
-    
-    // Category insights with more detailed analysis
-    if (categorySummary.length >= 2) {
-      const topCategory = categorySummary[0]
-      const secondCategory = categorySummary[1]
-      
-      // Spending concentration analysis
-      if (topCategory.percentage > 50) {
-        newInsights.push({
-          type: 'warning',
-          title: 'Spending Concentration',
-          description: `${topCategory.percentage}% of your spending is on ${topCategory.category}. Consider diversifying your expenses to better manage your budget.`,
-          sentiment: 'negative',
-        })
-      }
-
-      // Category comparison insights
-      if (topCategory.percentage > secondCategory.percentage * 2) {
-        newInsights.push({
-          type: 'info',
-          title: 'Category Balance',
-          description: `Your spending on ${topCategory.category} is more than double that of ${secondCategory.category}. Consider if this distribution aligns with your priorities.`,
-          sentiment: 'neutral',
-        })
-      }
-
-      // Essential vs Non-essential categories
-      const essentialCategories = ['Food', 'Transportation', 'Housing', 'Utilities']
-      const nonEssentialCategories = ['Entertainment', 'Shopping', 'Dining Out', 'Travel']
-      
-      const essentialSpending = categorySummary
-        .filter(cat => essentialCategories.includes(cat.category))
-        .reduce((sum, cat) => sum + cat.percentage, 0)
-      
-      const nonEssentialSpending = categorySummary
-        .filter(cat => nonEssentialCategories.includes(cat.category))
-        .reduce((sum, cat) => sum + cat.percentage, 0)
-
-      if (nonEssentialSpending > 40) {
-        newInsights.push({
-          type: 'warning',
-          title: 'Spending Priorities',
-          description: `${nonEssentialSpending}% of your spending is on non-essential categories. Consider reviewing these expenses to increase savings.`,
-          sentiment: 'negative',
-        })
-      }
-
-      // Category-specific advice
-      categorySummary.forEach(category => {
-        if (category.category === 'Food' && category.percentage > 30) {
+        if (budgetUsedPercentage > 90) {
+          newInsights.push({
+            type: 'warning',
+            title: 'Budget Alert',
+            description: `You've used ${budgetUsedPercentage}% of your monthly budget. At this rate, you'll exceed your budget by ₹${Math.abs(projectedMonthly - userDetails.monthlyBudget).toLocaleString()}.`,
+            sentiment: 'negative',
+          })
+        } else if (budgetUsedPercentage > 70) {
           newInsights.push({
             type: 'info',
-            title: 'Food Expenses',
-            description: `You're spending ${category.percentage}% of your budget on food. Consider meal planning and bulk buying to reduce costs.`,
+            title: 'Budget Status',
+            description: `You've used ${budgetUsedPercentage}% of your monthly budget. You're spending ₹${spendingRate.toLocaleString()} per day on average.`,
+            sentiment: 'neutral',
+          })
+        } else if (budgetUsedPercentage <= 70) {
+          newInsights.push({
+            type: 'success',
+            title: 'Budget On Track',
+            description: `You've only used ${budgetUsedPercentage}% of your monthly budget. You're ₹${(expectedSpendByNow - totalSpent).toLocaleString()} below expected spending!`,
+            sentiment: 'positive',
+          })
+        }
+      }
+      
+      // Category insights with more detailed analysis
+      if (categorySummary.length >= 2) {
+        const topCategory = categorySummary[0]
+        const secondCategory = categorySummary[1]
+        
+        // Spending concentration analysis
+        if (topCategory.percentage > 50) {
+          newInsights.push({
+            type: 'warning',
+            title: 'Spending Concentration',
+            description: `${topCategory.percentage}% of your spending is on ${topCategory.category}. Consider diversifying your expenses to better manage your budget.`,
+            sentiment: 'negative',
+          })
+        }
+
+        // Category comparison insights
+        if (topCategory.percentage > secondCategory.percentage * 2) {
+          newInsights.push({
+            type: 'info',
+            title: 'Category Balance',
+            description: `Your spending on ${topCategory.category} is more than double that of ${secondCategory.category}. Consider if this distribution aligns with your priorities.`,
             sentiment: 'neutral',
           })
         }
-        if (category.category === 'Entertainment' && category.percentage > 20) {
-          newInsights.push({
-            type: 'warning',
-            title: 'Entertainment Spending',
-            description: `Entertainment makes up ${category.percentage}% of your expenses. Look for free or lower-cost alternatives.`,
-            sentiment: 'negative',
-          })
-        }
-      })
-    }
-    
-    // Daily spending trends with more detailed analysis
-    if (dailySpending.length > 0) {
-      const last7Days = dailySpending.slice(-7)
-      const last7DaysTotal = last7Days.reduce((sum, day) => sum + day.amount, 0)
-      const averageDaily = last7DaysTotal / 7
-      const weekdays = last7Days.filter(day => {
-        const dayOfWeek = new Date(day.date).getDay()
-        return dayOfWeek !== 0 && dayOfWeek !== 6
-      })
-      const weekends = last7Days.filter(day => {
-        const dayOfWeek = new Date(day.date).getDay()
-        return dayOfWeek === 0 || dayOfWeek === 6
-      })
 
-      // Weekend vs Weekday spending
-      if (weekends.length > 0 && weekdays.length > 0) {
-        const weekendAvg = weekends.reduce((sum, day) => sum + day.amount, 0) / weekends.length
-        const weekdayAvg = weekdays.reduce((sum, day) => sum + day.amount, 0) / weekdays.length
+        // Essential vs Non-essential categories
+        const essentialCategories = ['Food', 'Transportation', 'Housing', 'Utilities']
+        const nonEssentialCategories = ['Entertainment', 'Shopping', 'Dining Out', 'Travel']
         
-        if (weekendAvg > weekdayAvg * 1.5) {
+        const essentialSpending = categorySummary
+          .filter(cat => essentialCategories.includes(cat.category))
+          .reduce((sum, cat) => sum + cat.percentage, 0)
+        
+        const nonEssentialSpending = categorySummary
+          .filter(cat => nonEssentialCategories.includes(cat.category))
+          .reduce((sum, cat) => sum + cat.percentage, 0)
+
+        if (nonEssentialSpending > 40) {
           newInsights.push({
             type: 'warning',
-            title: 'Weekend Spending',
-            description: `Your weekend spending (₹${weekendAvg.toLocaleString()}) is significantly higher than weekday spending (₹${weekdayAvg.toLocaleString()}). Consider planning weekend activities with a budget in mind.`,
+            title: 'Spending Priorities',
+            description: `${nonEssentialSpending}% of your spending is on non-essential categories. Consider reviewing these expenses to increase savings.`,
             sentiment: 'negative',
           })
         }
-      }
 
-      // Spending consistency
-      const spendingVariance = last7Days.reduce((sum, day) => {
-        return sum + Math.pow(day.amount - averageDaily, 2)
-      }, 0) / 7
-
-      if (spendingVariance > Math.pow(averageDaily, 2)) {
-        newInsights.push({
-          type: 'info',
-          title: 'Spending Consistency',
-          description: 'Your daily spending varies significantly. Try to maintain more consistent spending patterns for better budget management.',
-          sentiment: 'neutral',
+        // Category-specific advice
+        categorySummary.forEach(category => {
+          if (category.category === 'Food' && category.percentage > 30) {
+            newInsights.push({
+              type: 'info',
+              title: 'Food Expenses',
+              description: `You're spending ${category.percentage}% of your budget on food. Consider meal planning and bulk buying to reduce costs.`,
+              sentiment: 'neutral',
+            })
+          }
+          if (category.category === 'Entertainment' && category.percentage > 20) {
+            newInsights.push({
+              type: 'warning',
+              title: 'Entertainment Spending',
+              description: `Entertainment makes up ${category.percentage}% of your expenses. Look for free or lower-cost alternatives.`,
+              sentiment: 'negative',
+            })
+          }
         })
       }
-
-      // No-spend streak
-      let streak = 0
-      for (let i = dailySpending.length - 1; i >= 0; i--) {
-        if (dailySpending[i].amount === 0) streak++
-        else break
-      }
-      if (streak >= 2) {
-        newInsights.push({
-          type: 'success',
-          title: 'No-Spend Streak',
-          description: `You've had ${streak} day${streak > 1 ? 's' : ''} in a row with no spending. This is a great way to build savings!`,
-          sentiment: 'positive',
+      
+      // Daily spending trends with more detailed analysis
+      if (dailySpending.length > 0) {
+        const last7Days = dailySpending.slice(-7)
+        const last7DaysTotal = last7Days.reduce((sum, day) => sum + day.amount, 0)
+        const averageDaily = last7DaysTotal / 7
+        const weekdays = last7Days.filter(day => {
+          const dayOfWeek = new Date(day.date).getDay()
+          return dayOfWeek !== 0 && dayOfWeek !== 6
         })
-      }
-    }
-    
-    // Savings opportunity insights
-    if (categorySummary.length > 0) {
-      const potentialSavings = categorySummary
-        .filter(cat => cat.percentage > 15)
-        .map(cat => ({
-          category: cat.category,
-          potential: Math.round(cat.amount * 0.1) // Assuming 10% reduction is possible
-        }))
-        .filter(saving => saving.potential > 0)
-
-      if (potentialSavings.length > 0) {
-        const totalPotential = potentialSavings.reduce((sum, saving) => sum + saving.potential, 0)
-        newInsights.push({
-          type: 'success',
-          title: 'Savings Opportunity',
-          description: `You could save up to ₹${totalPotential.toLocaleString()} monthly by reducing spending in ${potentialSavings.map(s => s.category).join(', ')} by 10%.`,
-          sentiment: 'positive',
+        const weekends = last7Days.filter(day => {
+          const dayOfWeek = new Date(day.date).getDay()
+          return dayOfWeek === 0 || dayOfWeek === 6
         })
+
+        // Weekend vs Weekday spending
+        if (weekends.length > 0 && weekdays.length > 0) {
+          const weekendAvg = weekends.reduce((sum, day) => sum + day.amount, 0) / weekends.length
+          const weekdayAvg = weekdays.reduce((sum, day) => sum + day.amount, 0) / weekdays.length
+          
+          if (weekendAvg > weekdayAvg * 1.5) {
+            newInsights.push({
+              type: 'warning',
+              title: 'Weekend Spending',
+              description: `Your weekend spending (₹${weekendAvg.toLocaleString()}) is significantly higher than weekday spending (₹${weekdayAvg.toLocaleString()}). Consider planning weekend activities with a budget in mind.`,
+              sentiment: 'negative',
+            })
+          }
+        }
+
+        // Spending consistency
+        const spendingVariance = last7Days.reduce((sum, day) => {
+          return sum + Math.pow(day.amount - averageDaily, 2)
+        }, 0) / 7
+
+        if (spendingVariance > Math.pow(averageDaily, 2)) {
+          newInsights.push({
+            type: 'info',
+            title: 'Spending Consistency',
+            description: 'Your daily spending varies significantly. Try to maintain more consistent spending patterns for better budget management.',
+            sentiment: 'neutral',
+          })
+        }
+
+        // No-spend streak
+        let streak = 0
+        for (let i = dailySpending.length - 1; i >= 0; i--) {
+          if (dailySpending[i].amount === 0) streak++
+          else break
+        }
+        if (streak >= 2) {
+          newInsights.push({
+            type: 'success',
+            title: 'No-Spend Streak',
+            description: `You've had ${streak} day${streak > 1 ? 's' : ''} in a row with no spending. This is a great way to build savings!`,
+            sentiment: 'positive',
+          })
+        }
+      }
+      
+      // Savings opportunity insights
+      if (categorySummary.length > 0) {
+        const potentialSavings = categorySummary
+          .filter(cat => cat.percentage > 15)
+          .map(cat => ({
+            category: cat.category,
+            potential: Math.round(cat.amount * 0.1) // Assuming 10% reduction is possible
+          }))
+          .filter(saving => saving.potential > 0)
+
+        if (potentialSavings.length > 0) {
+          const totalPotential = potentialSavings.reduce((sum, saving) => sum + saving.potential, 0)
+          newInsights.push({
+            type: 'success',
+            title: 'Savings Opportunity',
+            description: `You could save up to ₹${totalPotential.toLocaleString()} monthly by reducing spending in ${potentialSavings.map(s => s.category).join(', ')} by 10%.`,
+            sentiment: 'positive',
+          })
+        }
       }
     }
     
