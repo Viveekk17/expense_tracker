@@ -66,30 +66,27 @@ const Dashboard = () => {
       <div className="space-y-8 p-6">
         {/* Greeting Message */}
         {showGreeting && (
-          <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 animate-fade-in-out w-full flex justify-center">
-            <div className={`px-6 py-3 rounded-full shadow-lg backdrop-blur-sm ${
-              userDetails?.monthlyBudget && (totalSpent / userDetails.monthlyBudget) * 100 > 100
+          <div className="fixed top-[150px] sm:top-[64px] left-1/2 -translate-x-1/2 z-50 animate-fade-in-out w-full flex justify-center px-2">
+            <div className={`px-3 sm:px-6 py-2 sm:py-3 rounded-full shadow-lg backdrop-blur-sm max-w-[95vw] sm:max-w-none text-xs sm:text-lg font-medium text-center
+              ${userDetails?.monthlyBudget && (totalSpent / userDetails.monthlyBudget) * 100 > 100
                 ? 'bg-red-500/90 dark:bg-red-500/80'
-                : 'bg-primary/90 dark:bg-primary/80'
-            } text-white`}>
-              <p className="text-lg font-medium">
-                {greetingMessage}
-              </p>
+                : 'bg-primary/90 dark:bg-primary/80'} text-white`}>
+              {greetingMessage}
             </div>
           </div>
         )}
         
         {/* Header Section */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <div>
             <h1 className="dashboard-title text-4xl mb-2">
               Financial Dashboard
             </h1>
             <p className="dashboard-subtitle text-lg">Track and manage your campus expenses</p>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="mt-4 sm:mt-0 w-full sm:w-auto">
             <Tabs value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="flex w-[340px] bg-transparent border-b-2 border-[#232b3b]">
+              <TabsList className="flex w-full sm:w-[340px] bg-transparent border-b-2 border-[#232b3b]">
                 <TabsTrigger
                   value="dashboard"
                   className={
