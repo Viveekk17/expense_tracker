@@ -43,7 +43,7 @@ const Navbar: React.FC = () => {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-base sm:text-xl bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                Campus Expense Compass
+                Walence
               </span>
               <div className="text-[10px] sm:text-xs text-gray-400 leading-tight">Track your spending wisely</div>
             </div>

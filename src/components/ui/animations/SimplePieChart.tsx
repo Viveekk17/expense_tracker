@@ -5,7 +5,13 @@ const COLORS = [
   '#ec4899', '#14b8a6', '#f97316', '#6366f1', '#64748b'
 ];
 
-export function SimplePieChart({ data }) {
+// Add hideLabels prop with TypeScript interface
+interface SimplePieChartProps {
+  data: any[];
+  hideLabels?: boolean;
+}
+
+export function SimplePieChart({ data, hideLabels = false }: SimplePieChartProps) {
   if (!data || data.length === 0) {
     return <div className="text-gray-400 text-center py-8">No data to display</div>;
   }
@@ -26,21 +32,23 @@ export function SimplePieChart({ data }) {
           ))}
         </Pie>
         <Tooltip />
-        <Legend
-          layout="horizontal"
-          verticalAlign="bottom"
-          align="center"
-          iconType="circle"
-          wrapperStyle={{
-            paddingTop: 16,
-            fontWeight: 600,
-            fontSize: 15,
-            color: '#cbd5e1',
-            display: 'flex',
-            justifyContent: 'center',
-            gap: 24,
-          }}
-        />
+        {!hideLabels && (
+          <Legend
+            layout="horizontal"
+            verticalAlign="bottom"
+            align="center"
+            iconType="circle"
+            wrapperStyle={{
+              paddingTop: 16,
+              fontWeight: 600,
+              fontSize: 15,
+              color: '#cbd5e1',
+              display: 'flex',
+              justifyContent: 'center',
+              gap: 24,
+            }}
+          />
+        )}
       </PieChart>
     </ResponsiveContainer>
   );

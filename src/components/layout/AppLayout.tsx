@@ -18,7 +18,7 @@ const AppLayout: React.FC<AppLayoutProps> = ({ children }) => {
         <div className="container mx-auto px-3 sm:px-4">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="text-center md:text-left">
-              <p className="text-sm">© {new Date().getFullYear()} Campus Expense Compass</p>
+              <p className="text-sm">© {new Date().getFullYear()} Walence</p>
             </div>
             <div className="text-center">
               <p className="text-sm font-medium mb-1">Developed by</p>

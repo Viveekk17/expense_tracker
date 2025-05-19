@@ -1,6 +1,6 @@
-# Campus Expense Compass - AWS Deployment Guide
+# Walence - AWS Deployment Guide
 
-This guide will walk you through the steps required to deploy the Campus Expense Compass application on AWS services. The application uses AWS Cognito for authentication, API Gateway and Lambda for the backend, DynamoDB for the database, and S3 for report storage.
+This guide will walk you through the steps required to deploy the Walence application on AWS services. The application uses AWS Cognito for authentication, API Gateway and Lambda for the backend, DynamoDB for the database, and S3 for report storage.
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ This guide will walk you through the steps required to deploy the Campus Expense
 3. Click "Create stack" > "With new resources (standard)"
 4. Select "Upload a template file" and upload the `cloudformation.yaml` file from this repository
 5. Click "Next"
-6. Enter a Stack name (e.g., `campus-expense-compass`)
+6. Enter a Stack name (e.g., `walence`)
 7. Keep the default Stage as `dev` (or change to `prod` if desired)
 8. Click "Next", "Next" again, and then "Create stack"
 9. Wait for the stack creation to complete (takes about 5-10 minutes)
@@ -36,12 +36,12 @@ If you prefer to set up each service manually:
    - Note the User Pool ID and App Client ID
 
 2. **DynamoDB Tables**:
-   - Create a table named `CampusExpenseCompass-Users-dev` with partition key `userId` (string)
-   - Create a table named `CampusExpenseCompass-Expenses-dev` with partition key `expenseId` (string)
+   - Create a table named `Walence-Users-dev` with partition key `userId` (string)
+   - Create a table named `Walence-Expenses-dev` with partition key `expenseId` (string)
    - Add a GSI named `UserIdIndex` with partition key `userId` to the expenses table
 
 3. **S3 Bucket**:
-   - Create a bucket for storing reports (e.g., `campus-expense-compass-reports-dev-YOUR_ACCOUNT_ID`)
+   - Create a bucket for storing reports (e.g., `walence-reports-dev-YOUR_ACCOUNT_ID`)
    - Configure CORS to allow access from your web app
 
 4. **Lambda Functions**:

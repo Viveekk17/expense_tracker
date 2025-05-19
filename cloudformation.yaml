@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'Campus Expense Compass - Student Expense Tracking Application'
+Description: 'Walence - Student Expense Tracking Application'
 
 Parameters:
   Stage:
@@ -15,7 +15,7 @@ Resources:
   UserPool:
     Type: AWS::Cognito::UserPool
     Properties:
-      UserPoolName: !Sub CampusExpenseCompass-UserPool-${Stage}
+      UserPoolName: !Sub Walence-UserPool-${Stage}
       AutoVerifiedAttributes:
         - email
       UsernameAttributes:
@@ -37,7 +37,7 @@ Resources:
   UserPoolClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:
-      ClientName: !Sub CampusExpenseCompass-Client-${Stage}
+      ClientName: !Sub Walence-Client-${Stage}
       UserPoolId: !Ref UserPool
       GenerateSecret: false
       ExplicitAuthFlows:
@@ -50,7 +50,7 @@ Resources:
   UsersTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub CampusExpenseCompass-Users-${Stage}
+      TableName: !Sub Walence-Users-${Stage}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: userId
@@ -62,7 +62,7 @@ Resources:
   ExpensesTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub CampusExpenseCompass-Expenses-${Stage}
+      TableName: !Sub Walence-Expenses-${Stage}
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:
         - AttributeName: expenseId
@@ -84,7 +84,7 @@ Resources:
   ReportsBucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: !Sub campus-expense-compass-reports-${Stage}-${AWS::AccountId}
+      BucketName: !Sub walence-reports-${Stage}-${AWS::AccountId}
       PublicAccessBlockConfiguration:
         BlockPublicAcls: true
         BlockPublicPolicy: true
@@ -145,7 +145,7 @@ Resources:
   UsersFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub CampusExpenseCompass-Users-${Stage}
+      FunctionName: !Sub Walence-Users-${Stage}
       Runtime: nodejs18.x
       Handler: users.handler
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -161,7 +161,7 @@ Resources:
   ExpensesFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub CampusExpenseCompass-Expenses-${Stage}
+      FunctionName: !Sub Walence-Expenses-${Stage}
       Runtime: nodejs18.x
       Handler: expenses.handler
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -177,7 +177,7 @@ Resources:
   ReportsFunction:
     Type: AWS::Lambda::Function
     Properties:
-      FunctionName: !Sub CampusExpenseCompass-Reports-${Stage}
+      FunctionName: !Sub Walence-Reports-${Stage}
       Runtime: nodejs18.x
       Handler: reports.handler
       Role: !GetAtt LambdaExecutionRole.Arn
@@ -195,8 +195,8 @@ Resources:
   ApiGateway:
     Type: AWS::ApiGateway::RestApi
     Properties:
-      Name: !Sub CampusExpenseCompass-API-${Stage}
-      Description: API for Campus Expense Compass
+      Name: !Sub Walence-API-${Stage}
+      Description: API for Walence
       EndpointConfiguration:
         Types:
           - REGIONAL
@@ -265,7 +265,7 @@ Resources:
   ApiAuthorizer:
     Type: AWS::ApiGateway::Authorizer
     Properties:
-      Name: !Sub CampusExpenseCompass-Authorizer-${Stage}
+      Name: !Sub Walence-Authorizer-${Stage}
       Type: COGNITO_USER_POOLS
       IdentitySource: method.request.header.Authorization
       RestApiId: !Ref ApiGateway

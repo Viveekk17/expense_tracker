@@ -38,7 +38,7 @@ const Auth: React.FC = () => {
           <div className="w-full max-w-md space-y-8 animate-fadeIn">
             <div className="text-center">
               <h1 className="text-4xl font-extrabold tracking-tight mb-2 gradient-text">
-                Campus Expense Compass
+                Walence
               </h1>
               <p className="text-lg text-muted-foreground mb-6 max-w-md mx-auto">
                 Track, manage and analyze your student expenses with ease
@@ -52,7 +52,7 @@ const Auth: React.FC = () => {
         </main>
         
         <footer className="mt-auto py-4 text-center text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} Campus Expense Compass. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Walence. All rights reserved.</p>
         </footer>
       </div>
     </div>

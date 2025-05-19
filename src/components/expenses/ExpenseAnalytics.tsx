@@ -6,7 +6,7 @@ import { Alert, AlertDescription, AlertTitle } from '../ui/alert'
 import { AlertTriangle, Info, LineChart, PieChart, TrendingUp, Tag } from 'lucide-react'
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
-  Cell, PieChart as RechartsPieChart, Pie, Legend, LineChart as RechartsLineChart, Line 
+  Cell, PieChart as RechartsPieChart, Pie, Legend, LineChart as RechartsLineChart, Line, Area 
 } from '../ui/chart'
 import { Button } from '../ui/button'
 import { AnimatedPieChart } from '../ui/animations/AnimatedPieChart'
@@ -338,98 +338,98 @@ export function ExpenseAnalytics() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div className="space-y-3 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-white">Expense Analytics</h2>
-          <p className="text-gray-400 mt-1">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">Expense Analytics</h2>
+          <p className="text-sm sm:text-base text-gray-400 mt-0.5 sm:mt-1">
             Visualize and analyze your spending patterns to make better financial decisions.
           </p>
         </div>
-        <div className="mt-4 sm:mt-0">
-          <Button variant="outline" className="w-full sm:w-auto rounded-full bg-indigo-600/20 border-indigo-500/30 text-indigo-400 hover:bg-indigo-600/30 hover:text-indigo-300">
+        <div className="mt-1.5 sm:mt-0">
+          <Button variant="outline" className="w-full sm:w-auto rounded-full bg-indigo-600/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-600/20 hover:text-indigo-300">
             <LineChart className="h-4 w-4 mr-2" />
             Statistics
           </Button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
-        <div className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-blue-400 to-blue-500"></div>
-          <div className="p-3 sm:p-4">
-            <div className="flex items-center mb-3 sm:mb-4">
-              <div className="rounded-full bg-blue-900/30 p-1 mr-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-blue-400/80 to-blue-500/80"></div>
+          <div className="p-2.5 sm:p-4">
+            <div className="flex items-center mb-1.5 sm:mb-3">
+              <div className="rounded-full bg-blue-900/20 p-1 mr-2">
                 <LineChart className="h-4 w-4 text-blue-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-300">Top Categories</h3>
             </div>
             {categorySummary.length > 0 ? (
-              <div className="space-y-2 sm:space-y-3">
+              <div className="space-y-1.5 sm:space-y-2">
                 {categorySummary.slice(0, 3).map((category, index) => (
-                  <div key={category.category} className="flex items-center text-gray-400 text-sm sm:text-base">
-                    <div className="w-2 h-2 rounded-full bg-blue-500 mr-2"></div>
-                    <span className="truncate">{category.category}</span>
-                    <span className="ml-auto whitespace-nowrap">₹{category.amount.toLocaleString()}</span>
+                  <div key={category.category} className="flex items-center text-gray-400 text-sm">
+                    <div className="w-2 h-2 rounded-full bg-blue-500/80 mr-2"></div>
+                    <span className="truncate flex-1">{category.category}</span>
+                    <span className="ml-2 whitespace-nowrap">₹{category.amount.toLocaleString()}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-sm sm:text-base">Add expenses to see top categories</p>
+              <p className="text-gray-500 text-sm">Add expenses to see top categories</p>
             )}
           </div>
         </div>
 
-        <div className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-green-400 to-emerald-500"></div>
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <div className="rounded-full bg-green-900/30 p-1 mr-2">
+        <div className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-green-400/80 to-emerald-500/80"></div>
+          <div className="p-2.5 sm:p-4">
+            <div className="flex items-center mb-1.5 sm:mb-3">
+              <div className="rounded-full bg-green-900/20 p-1 mr-2">
                 <TrendingUp className="h-4 w-4 text-green-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-300">7 Day Trend</h3>
             </div>
-            <div className="text-2xl font-bold text-white">
+            <div className="text-xl sm:text-2xl font-bold text-white">
               ₹{dailySpending.slice(-7).reduce((sum, day) => sum + day.amount, 0).toLocaleString()}
             </div>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-gray-400 mt-0.5 sm:mt-1">
               vs ₹0 previous week
             </p>
           </div>
         </div>
 
-        <div className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-amber-400 to-yellow-500"></div>
-          <div className="p-4">
-            <div className="flex items-center mb-4">
-              <div className="rounded-full bg-amber-900/30 p-1 mr-2">
+        <div className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-amber-400/80 to-yellow-500/80"></div>
+          <div className="p-2.5 sm:p-4">
+            <div className="flex items-center mb-1.5 sm:mb-3">
+              <div className="rounded-full bg-amber-900/20 p-1 mr-2">
                 <Tag className="h-4 w-4 text-amber-400" />
               </div>
               <h3 className="text-sm font-medium text-gray-300">Largest Expense</h3>
             </div>
             {dailySpending.length > 0 ? (
               <>
-                <div className="text-2xl font-bold text-white">
+                <div className="text-xl sm:text-2xl font-bold text-white">
                   ₹{Math.max(...dailySpending.map(day => day.amount)).toLocaleString()}
                 </div>
-                <div className="mt-1">
-                  <span className="px-1.5 py-0.5 bg-amber-900/30 text-amber-400 rounded-full text-xs">
+                <div className="mt-0.5 sm:mt-1">
+                  <span className="px-1.5 py-0.5 bg-amber-900/20 text-amber-400 rounded-full text-xs">
                     {categorySummary.length > 0 ? categorySummary[0].category : 'Food'}
                   </span>
                 </div>
               </>
             ) : (
-              <p className="text-gray-500">Add expenses to see largest expense</p>
+              <p className="text-gray-500 text-sm">Add expenses to see largest expense</p>
             )}
           </div>
         </div>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4 mt-4">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-2 sm:space-y-4 mt-2 sm:mt-4">
         {/* Mobile: Nicer custom dropdown for tabs */}
-        <div className="w-full mb-2 sm:hidden">
+        <div className="w-full mb-1.5 sm:mb-2 sm:hidden">
           <Select value={activeTab} onValueChange={setActiveTab}>
-            <SelectTrigger className="w-full rounded-lg bg-[#232b3b] text-indigo-300 font-semibold py-2 px-3 text-base border-none focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <SelectTrigger className="w-full rounded-lg bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 text-indigo-300 font-semibold py-1.5 sm:py-2 px-2.5 sm:px-3 text-sm">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -439,36 +439,37 @@ export function ExpenseAnalytics() {
             </SelectContent>
           </Select>
         </div>
-        {/* Desktop: Original tab list */}
-        <TabsList className="hidden sm:flex w-full bg-transparent border-b border-[#232b3b] mb-2">
-          <TabsTrigger value="insights" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'insights' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Insights</TabsTrigger>
-          <TabsTrigger value="categories" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'categories' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Categories</TabsTrigger>
-          <TabsTrigger value="trends" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'trends' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Spending Trends</TabsTrigger>
+
+        {/* Desktop: Original tab list - Remove "dropdown" text */}
+        <TabsList className="hidden sm:flex w-full bg-transparent border-b border-[#232b3b]/50 mb-2">
+          <TabsTrigger value="insights" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-sm sm:text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'insights' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Insights</TabsTrigger>
+          <TabsTrigger value="categories" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-sm sm:text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'categories' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Categories</TabsTrigger>
+          <TabsTrigger value="trends" className={`relative flex-1 flex items-center justify-center gap-2 px-0 py-2 font-semibold text-sm sm:text-base transition-all duration-200 bg-transparent border-none outline-none ${activeTab === 'trends' ? 'text-primary font-bold' : 'text-gray-400 hover:text-primary font-normal'}`}>Spending Trends</TabsTrigger>
         </TabsList>
-        
-        <TabsContent value="insights" className="space-y-4">
-          <div className="flex gap-2 mb-4">
+
+        <TabsContent value="insights" className="space-y-2 sm:space-y-4">
+          <div className="flex gap-1.5 sm:gap-2 mb-2 sm:mb-4 overflow-x-auto pb-1.5 sm:pb-2">
             <Button
               variant={insightFilter === 'all' ? 'default' : 'outline'}
               size="sm"
-              className={`${insightFilter === 'all' ? 'bg-indigo-600 text-white font-bold' : 'text-gray-400'}`}
+              className={`${insightFilter === 'all' ? 'bg-indigo-600/80 text-white font-bold' : 'text-gray-400 bg-[#121828]/80 border-[#232b3b]/50'} py-1 sm:py-1.5 px-2 sm:px-3`}
               onClick={() => setInsightFilter('all')}
             >All</Button>
             <Button
               variant={insightFilter === 'positive' ? 'default' : 'outline'}
               size="sm"
-              className={`${insightFilter === 'positive' ? 'bg-emerald-600 text-white font-bold' : 'text-gray-400'}`}
+              className={`${insightFilter === 'positive' ? 'bg-emerald-600/80 text-white font-bold' : 'text-gray-400 bg-[#121828]/80 border-[#232b3b]/50'} py-1 sm:py-1.5 px-2 sm:px-3`}
               onClick={() => setInsightFilter('positive')}
             >Positive</Button>
             <Button
               variant={insightFilter === 'negative' ? 'default' : 'outline'}
               size="sm"
-              className={`${insightFilter === 'negative' ? 'bg-orange-600 text-white font-bold' : 'text-gray-400'}`}
+              className={`${insightFilter === 'negative' ? 'bg-orange-600/80 text-white font-bold' : 'text-gray-400 bg-[#121828]/80 border-[#232b3b]/50'} py-1 sm:py-1.5 px-2 sm:px-3`}
               onClick={() => setInsightFilter('negative')}
             >Negative</Button>
           </div>
           {insights.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
               {insights
                 .filter(insight =>
                   insightFilter === 'all' ? true :
@@ -478,41 +479,41 @@ export function ExpenseAnalytics() {
                 .map((insight, index) => (
                   <Card 
                     key={index} 
-                    className={`bg-[#121828] border-0 shadow-lg rounded-xl overflow-hidden transform transition-all duration-200 hover:scale-[1.02] ${
+                    className={`bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden transform transition-all duration-200 hover:scale-[1.01] ${
                       insight.type === 'warning' 
-                        ? 'border-l-4 border-l-orange-500 hover:shadow-orange-500/20' 
+                        ? 'border-l-4 border-l-orange-500/80 hover:shadow-orange-500/10' 
                         : insight.type === 'success' 
-                          ? 'border-l-4 border-l-emerald-500 hover:shadow-emerald-500/20' 
-                          : 'border-l-4 border-l-blue-500 hover:shadow-blue-500/20'
+                          ? 'border-l-4 border-l-emerald-500/80 hover:shadow-emerald-500/10' 
+                        : 'border-l-4 border-l-blue-500/80 hover:shadow-blue-500/10'
                     }`}
                   >
                     <div className={`h-1 bg-gradient-to-r ${
                       insight.type === 'warning' 
-                        ? 'from-orange-400 to-orange-500' 
+                        ? 'from-orange-400/80 to-orange-500/80' 
                         : insight.type === 'success' 
-                          ? 'from-emerald-400 to-emerald-500' 
-                          : 'from-blue-400 to-blue-500'
+                          ? 'from-emerald-400/80 to-emerald-500/80' 
+                        : 'from-blue-400/80 to-blue-500/80'
                     }`}></div>
-                    <CardHeader className="py-4">
-                      <div className="flex items-center gap-3">
+                    <CardHeader className="py-2 px-2.5 sm:py-4 sm:px-6">
+                      <div className="flex items-center gap-1.5 sm:gap-3">
                         {insight.type === 'warning' ? (
-                          <div className="rounded-full bg-orange-500/20 p-2">
-                            <AlertTriangle className="h-5 w-5 text-orange-500" />
+                          <div className="rounded-full bg-orange-500/20 p-1 sm:p-2">
+                            <AlertTriangle className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-orange-500" />
                           </div>
                         ) : insight.type === 'success' ? (
-                          <div className="rounded-full bg-emerald-500/20 p-2">
-                            <LineChart className="h-5 w-5 text-emerald-500" />
+                          <div className="rounded-full bg-emerald-500/20 p-1 sm:p-2">
+                            <LineChart className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-emerald-500" />
                           </div>
                         ) : (
-                          <div className="rounded-full bg-blue-500/20 p-2">
-                            <Info className="h-5 w-5 text-blue-500" />
+                          <div className="rounded-full bg-blue-500/20 p-1 sm:p-2">
+                            <Info className="h-3.5 w-3.5 sm:h-5 sm:w-5 text-blue-500" />
                           </div>
                         )}
-                        <CardTitle className="text-lg font-bold text-white">{insight.title}</CardTitle>
+                        <CardTitle className="text-base sm:text-lg font-bold text-white">{insight.title}</CardTitle>
                       </div>
                     </CardHeader>
-                    <CardContent className="py-0 pb-4">
-                      <p className="text-gray-300 text-base leading-relaxed">
+                    <CardContent className="py-0 pb-2 px-2.5 sm:pb-4 sm:px-6">
+                      <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
                         {insight.description}
                       </p>
                     </CardContent>
@@ -520,67 +521,64 @@ export function ExpenseAnalytics() {
                 ))}
             </div>
           ) : (
-            <Card className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-              <div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-              <CardContent className="py-10 text-center">
-                <div className="rounded-full bg-blue-500/20 p-3 w-fit mx-auto mb-4">
-                  <Info className="h-6 w-6 text-blue-500" />
+            <Card className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+              <div className="h-1 bg-gradient-to-r from-blue-400/80 to-indigo-500/80"></div>
+              <CardContent className="py-6 sm:py-10 text-center">
+                <div className="rounded-full bg-blue-500/20 p-1.5 sm:p-3 w-fit mx-auto mb-2 sm:mb-4">
+                  <Info className="h-4 w-4 sm:h-6 sm:w-6 text-blue-500" />
                 </div>
-                <p className="text-gray-300 text-lg">
+                <p className="text-base sm:text-lg text-gray-300">
                   Add more expenses to generate personalized insights.
                 </p>
-                <p className="text-gray-400 mt-2">
+                <p className="text-sm sm:text-base text-gray-400 mt-1 sm:mt-2">
                   We'll analyze your spending patterns and provide actionable recommendations.
                 </p>
               </CardContent>
             </Card>
           )}
         </TabsContent>
-        
+
         <TabsContent value="categories">
-          <Card className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 sm:p-6">
+          <Card className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-blue-400/80 to-indigo-500/80"></div>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-2 p-2.5 sm:p-6">
               <div className="w-full">
-                <CardTitle className="text-lg sm:text-xl text-gray-300">Category Breakdown</CardTitle>
-                <CardDescription className="text-sm text-gray-400 mt-1">
+                <CardTitle className="text-base sm:text-xl text-gray-300">Category Breakdown</CardTitle>
+                <CardDescription className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1">
                   View how your spending is distributed across different categories
                 </CardDescription>
               </div>
-              {/* Chart toggle: mobile as toggle group, desktop as button */}
               {categorySummary.length > 0 && (
-                <div className="w-full sm:w-auto mt-2 sm:mt-0">
-                  {/* Mobile: toggle group */}
-                  <div className="flex w-full sm:hidden gap-1.5 bg-gray-800/50 p-1 rounded-lg">
+                <div className="w-full sm:w-auto mt-1.5 sm:mt-0">
+                  <div className="flex w-full sm:hidden gap-1 sm:gap-1.5 bg-[#1a2234]/50 p-0.5 sm:p-1 rounded-lg">
                     <button
-                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 py-1 sm:py-1.5 px-1.5 sm:px-2 rounded-md text-xs font-medium transition-all duration-200 ${
                         categoryChartType === 'pie' 
                           ? 'bg-indigo-600/20 text-indigo-300 shadow' 
                           : 'bg-transparent text-gray-400 hover:text-primary'
                       }`}
                       onClick={() => setCategoryChartType('pie')}
                     >
-                      <PieChart className="h-4 w-4 inline-block mr-1.5" />
+                      <PieChart className="h-3 w-3 sm:h-3.5 sm:w-3.5 inline-block mr-0.5 sm:mr-1" />
                       Pie
                     </button>
                     <button
-                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                      className={`flex-1 py-1 sm:py-1.5 px-1.5 sm:px-2 rounded-md text-xs font-medium transition-all duration-200 ${
                         categoryChartType === 'bar' 
                           ? 'bg-indigo-600/20 text-indigo-300 shadow' 
                           : 'bg-transparent text-gray-400 hover:text-primary'
                       }`}
                       onClick={() => setCategoryChartType('bar')}
                     >
-                      <BarChart className="h-4 w-4 inline-block mr-1.5" />
+                      <BarChart className="h-3 w-3 sm:h-3.5 sm:w-3.5 inline-block mr-0.5 sm:mr-1" />
                       Bar
                     </button>
                   </div>
-                  {/* Desktop: single button */}
                   <div className="hidden sm:block">
                     <Button
                       variant="outline"
                       size="sm"
-                      className="rounded-full bg-indigo-600/20 border-indigo-500/30 text-indigo-400 hover:bg-indigo-600/30 hover:text-indigo-300"
+                      className="rounded-full bg-indigo-600/10 border-indigo-500/20 text-indigo-400 hover:bg-indigo-600/20 hover:text-indigo-300"
                       onClick={() => setCategoryChartType(categoryChartType === 'pie' ? 'bar' : 'pie')}
                     >
                       {categoryChartType === 'pie' ? (
@@ -599,7 +597,7 @@ export function ExpenseAnalytics() {
                 </div>
               )}
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
+            <CardContent className="p-2.5 sm:p-6">
               {categorySummary.length > 0 ? (
                 <div className="h-[280px] sm:h-[400px] w-full">
                   <SwitchTransition mode="out-in">
@@ -609,38 +607,71 @@ export function ExpenseAnalytics() {
                       classNames="fade"
                     >
                       <div className="w-full h-full flex items-center justify-center">
-                        {categoryChartType === 'pie' ? (
-                          <SimplePieChart data={categorySummary} />
+                                                  {categoryChartType === 'pie' ? (
+                            <div className="w-[80%] sm:w-full mx-auto h-[85%] sm:h-full flex items-center justify-center relative">
+                              <SimplePieChart 
+                               data={categorySummary}
+                               hideLabels={true}
+                              />
+                             
+                              {/* Custom legend for pie chart */}
+                              <div className="absolute bottom-0 w-full">
+                                <div className="flex flex-wrap gap-3 justify-center">
+                                  {categorySummary.slice(0, 5).map((category, index) => (
+                                    <div key={category.category} className="flex items-center text-xs">
+                                      <div 
+                                        className="w-2.5 h-2.5 rounded-full mr-1.5" 
+                                        style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                                      ></div>
+                                      <span className="text-gray-300">{category.category}</span>
+                                      <span className="ml-1 text-gray-400">({category.percentage}%)</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
                         ) : (
                           <ResponsiveContainer width="100%" height="100%">
                             <BarChart
                               layout="vertical"
                               data={categorySummary.slice(0, 5)}
-                              margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+                              margin={{ 
+                                top: 5, 
+                                right: 30, 
+                                left: 40, 
+                                bottom: 10 
+                              }}
+                              barSize={24}
                             >
-                              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
+                              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" opacity={0.3} />
                               <XAxis 
                                 type="number" 
-                                tickFormatter={(value) => `₹${value}`} 
+                                tickFormatter={(value) => `₹${value.toLocaleString()}`} 
                                 stroke="#94a3b8"
                                 tick={{ fontSize: 11, fill: '#94a3b8' }}
+                                axisLine={{ stroke: '#334155' }}
+                                tickLine={{ stroke: '#334155' }}
                               />
                               <YAxis 
                                 type="category" 
                                 dataKey="category" 
                                 tick={{ fontSize: 12, fill: '#94a3b8' }} 
                                 width={80} 
-                                stroke="#94a3b8" 
+                                stroke="#94a3b8"
+                                axisLine={{ stroke: '#334155' }}
+                                tickLine={{ stroke: '#334155' }}
                               />
                               <Tooltip 
-                                formatter={(value) => [`₹${value}`, 'Amount']}
+                                formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Amount']}
                                 contentStyle={{ 
                                   backgroundColor: '#192031', 
                                   borderColor: '#334155',
                                   borderRadius: '8px',
-                                  padding: '8px'
+                                  padding: '8px',
+                                  boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
                                 }}
                                 itemStyle={{ color: '#e2e8f0' }}
+                                cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }}
                               />
                               <Bar 
                                 dataKey="amount"
@@ -662,40 +693,41 @@ export function ExpenseAnalytics() {
                 </div>
               ) : (
                 <div className="flex h-[280px] sm:h-[400px] items-center justify-center">
-                  <p className="text-center text-gray-400 text-sm sm:text-base">
+                  <p className="text-center text-gray-400 text-sm">
                     Add expenses to see category breakdown
                   </p>
                 </div>
               )}
             </CardContent>
-            <CardFooter className="border-t border-gray-800 p-4 sm:p-6 flex flex-col sm:flex-row sm:justify-between gap-2">
-              <div className="text-sm text-gray-400">
+            <CardFooter className="border-t border-[#232b3b]/50 p-2.5 sm:p-6 flex flex-col sm:flex-row sm:justify-between gap-1.5 sm:gap-2">
+              <div className="text-xs sm:text-sm text-gray-400">
                 {categorySummary.length > 0 && 
                   `Your highest spending is on ${categorySummary[0].category} (${categorySummary[0].percentage}% of total)`}
               </div>
               {categorySummary.length > 0 && 
-                <div className="text-sm font-medium text-gray-300">
+                <div className="text-xs sm:text-sm font-medium text-gray-300">
                   Total Categories: {categorySummary.length}
                 </div>
               }
             </CardFooter>
           </Card>
         </TabsContent>
-        <TabsContent value="trends" className="space-y-4">
-          <Card className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
-            <div className="h-1 bg-gradient-to-r from-emerald-400 to-green-500"></div>
-            <CardHeader className="p-4 sm:p-6">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
+        <TabsContent value="trends" className="space-y-2 sm:space-y-4">
+          <Card className="bg-[#121828]/80 backdrop-blur-sm border border-[#232b3b]/50 shadow-sm rounded-xl overflow-hidden">
+            <div className="h-1 bg-gradient-to-r from-emerald-400/80 to-green-500/80"></div>
+            <CardHeader className="p-2.5 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 sm:gap-3">
                 <div>
-                  <CardTitle className="text-lg sm:text-xl text-gray-300">Daily Spending Trends</CardTitle>
-                  <CardDescription className="text-sm text-gray-400 mt-1">
+                  <CardTitle className="text-base sm:text-xl text-gray-300">Daily Spending Trends</CardTitle>
+                  <CardDescription className="text-xs sm:text-sm text-gray-400 mt-0.5 sm:mt-1">
                     Track your spending patterns over the last 30 days
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-400">View:</span>
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <span className="text-xs sm:text-sm text-gray-400">View:</span>
                   <Select value={trendRange} onValueChange={v => setTrendRange(v as 'week' | 'month')}>
-                    <SelectTrigger className="w-[120px] bg-[#181f2a] border border-[#232b3b] text-gray-200 text-sm">
+                    <SelectTrigger className="w-[90px] sm:w-[120px] bg-[#1a2234]/50 border border-[#232b3b]/50 text-gray-200 text-xs sm:text-sm py-1 sm:py-1.5">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -706,10 +738,10 @@ export function ExpenseAnalytics() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-4 sm:p-6">
-              <div className="h-[280px] sm:h-[400px] w-full">
+            <CardContent className="p-2.5 sm:p-6">
+              <div className="h-[240px] sm:h-[400px] w-full">
                 {dailySpending.length > 0 ? (
-                  <div className="bg-[#1a2234] rounded-lg h-full w-full p-3 sm:p-4">
+                  <div className="bg-[#1a2234]/70 rounded-lg h-full w-full p-2.5 sm:p-3">
                     <div className="h-full w-full">
                       <SwitchTransition mode="out-in">
                         <CSSTransition
@@ -721,29 +753,57 @@ export function ExpenseAnalytics() {
                           <ResponsiveContainer width="100%" height="100%">
                             <RechartsLineChart
                               data={trendRange === 'week' ? dailySpending.slice(-7) : dailySpending}
-                              margin={{ top: 10, right: 20, left: 30, bottom: 40 }}
+                              margin={{ 
+                                top: window.innerWidth < 640 ? 18 : 10, 
+                                right: window.innerWidth < 640 ? 12 : 20, 
+                                left: window.innerWidth < 640 ? 8 : 30, 
+                                bottom: window.innerWidth < 640 ? 32 : 40 
+                              }}
                             >
-                              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                              <CartesianGrid 
+                                strokeDasharray="3 3" 
+                                stroke="#334155" 
+                                opacity={0.3}
+                                vertical={window.innerWidth >= 640}
+                                horizontal={true}
+                              />
                               <XAxis 
                                 dataKey="date" 
                                 tickFormatter={formatDate}
-                                tick={{ fontSize: 11, fill: '#cbd5e1' }}
-                                height={60}
-                                interval={trendRange === 'week' ? 0 : 4}
+                                tick={{ 
+                                  fontSize: window.innerWidth < 640 ? 9 : 11, 
+                                  fill: '#cbd5e1',
+                                }}
+                                height={window.innerWidth < 640 ? 30 : 60}
+                                interval={trendRange === 'week' ? 0 : window.innerWidth < 640 ? 'preserveStartEnd' : 4}
                                 stroke="#94a3b8"
-                                label={{ 
+                                axisLine={{ stroke: '#334155' }}
+                                tickLine={{ stroke: '#334155' }}
+                                tickMargin={window.innerWidth < 640 ? 5 : 10}
+                                label={window.innerWidth < 640 ? {} : { 
                                   value: 'Date', 
                                   position: 'insideBottom', 
                                   offset: 0, 
                                   fill: '#cbd5e1', 
                                   fontSize: 12 
                                 }}
+                                textAnchor={window.innerWidth < 640 ? "middle" : undefined}
                               />
                               <YAxis 
-                                tickFormatter={(value) => `₹${value}`}
+                                tickFormatter={(value) => window.innerWidth < 640 ? 
+                                  (value >= 1000 ? `₹${Math.round(value/1000)}k` : `₹${Math.round(value)}`) 
+                                  : `₹${value.toLocaleString()}`}
                                 stroke="#94a3b8"
-                                tick={{ fontSize: 11, fill: '#cbd5e1' }}
-                                label={{ 
+                                tick={{ 
+                                  fontSize: window.innerWidth < 640 ? 9 : 11, 
+                                  fill: '#cbd5e1' 
+                                }}
+                                axisLine={{ stroke: '#334155' }}
+                                tickLine={{ stroke: '#334155' }}
+                                width={window.innerWidth < 640 ? 30 : 60}
+                                tickCount={window.innerWidth < 640 ? 4 : 7}
+                                domain={['dataMin - 100', 'dataMax + 100']}
+                                label={window.innerWidth < 640 ? undefined : { 
                                   value: 'Amount (₹)', 
                                   angle: -90, 
                                   position: 'insideLeft', 
@@ -753,27 +813,53 @@ export function ExpenseAnalytics() {
                                 }}
                               />
                               <Tooltip 
-                                formatter={(value) => [`₹${value}`, 'Amount']}
-                                labelFormatter={(value) => `Date: ${formatDate(value)}`}
+                                formatter={(value) => [`₹${Number(value).toLocaleString()}`, 'Amount']}
+                                labelFormatter={(value) => `${formatDate(value)}`}
                                 contentStyle={{ 
                                   backgroundColor: '#232b3b', 
                                   borderColor: '#334155', 
                                   borderRadius: 8, 
-                                  padding: '8px',
-                                  fontSize: '13px'
+                                  padding: window.innerWidth < 640 ? '4px' : '8px',
+                                  fontSize: window.innerWidth < 640 ? '10px' : '13px'
                                 }}
                                 itemStyle={{ color: '#fff' }}
+                                cursor={{ stroke: '#6366f1', strokeWidth: 1 }}
+                                isAnimationActive={true}
+                                wrapperStyle={window.innerWidth < 640 ? { zIndex: 1000 } : undefined}
                               />
+                              <defs>
+                                <linearGradient id="lineGradient" x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor="#6366f1" stopOpacity={0.3} />
+                                  <stop offset="100%" stopColor="#6366f1" stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
                               <Line
                                 type="monotone"
                                 dataKey="amount"
                                 stroke="#6366f1"
-                                strokeWidth={2}
-                                dot={{ r: 4, fill: '#fff', stroke: '#6366f1', strokeWidth: 2 }}
-                                activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
+                                strokeWidth={window.innerWidth < 640 ? 1.5 : 2}
+                                dot={{ 
+                                  r: window.innerWidth < 640 ? 2 : 4, 
+                                  fill: '#fff', 
+                                  stroke: '#6366f1', 
+                                  strokeWidth: window.innerWidth < 640 ? 1 : 2 
+                                }}
+                                activeDot={{ 
+                                  r: window.innerWidth < 640 ? 4 : 6, 
+                                  fill: '#6366f1', 
+                                  stroke: '#fff', 
+                                  strokeWidth: window.innerWidth < 640 ? 1 : 2 
+                                }}
                                 animationBegin={0}
                                 animationDuration={1500}
                                 animationEasing="ease-out"
+                              />
+                              <Area
+                                type="monotone"
+                                dataKey="amount"
+                                fill="url(#lineGradient)"
+                                stroke="none"
+                                animationDuration={1500}
                               />
                             </RechartsLineChart>
                           </ResponsiveContainer>
@@ -782,43 +868,43 @@ export function ExpenseAnalytics() {
                     </div>
                   </div>
                 ) : (
-                  <div className="flex h-full items-center justify-center bg-[#1a2234] rounded-lg">
-                    <p className="text-center text-gray-400 text-sm sm:text-base">
+                  <div className="flex h-full items-center justify-center bg-[#1a2234]/70 rounded-lg">
+                    <p className="text-center text-gray-400 text-sm">
                       Add expenses to see daily spending trends
                     </p>
                   </div>
                 )}
               </div>
               {dailySpending.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
-                    <h4 className="text-sm font-medium mb-1 text-gray-400">Last 7 Days</h4>
-                    <div className="text-lg sm:text-xl font-bold text-white">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-1.5 sm:gap-3 mt-2 sm:mt-4">
+                  <div className="bg-[#1a2234]/50 rounded-lg p-2 sm:p-3">
+                    <h4 className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 text-gray-400">Last 7 Days</h4>
+                    <div className="text-base sm:text-xl font-bold text-white">
                       ₹{dailySpending.slice(-7).reduce((sum, day) => sum + day.amount, 0).toLocaleString()}
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-0.5 sm:mt-1">
                       Total spending in past week
                     </p>
                   </div>
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
-                    <h4 className="text-sm font-medium mb-1 text-gray-400">Daily Average</h4>
-                    <div className="text-lg sm:text-xl font-bold text-white">
+                  <div className="bg-[#1a2234]/50 rounded-lg p-2 sm:p-3">
+                    <h4 className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 text-gray-400">Daily Average</h4>
+                    <div className="text-base sm:text-xl font-bold text-white">
                       ₹{Math.round(dailySpending.slice(-30).reduce((sum, day) => sum + day.amount, 0) / 30).toLocaleString()}
                     </div>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-xs text-gray-400 mt-0.5 sm:mt-1">
                       Average daily expense
                     </p>
                   </div>
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
-                    <h4 className="text-sm font-medium mb-1 text-gray-400">Highest Day</h4>
+                  <div className="bg-[#1a2234]/50 rounded-lg p-2 sm:p-3">
+                    <h4 className="text-xs sm:text-sm font-medium mb-0.5 sm:mb-1 text-gray-400">Highest Day</h4>
                     {(() => {
                       const highestDay = [...dailySpending].sort((a, b) => b.amount - a.amount)[0];
                       return (
                         <>
-                          <div className="text-lg sm:text-xl font-bold text-white">
+                          <div className="text-base sm:text-xl font-bold text-white">
                             ₹{highestDay.amount.toLocaleString()}
                           </div>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-gray-400 mt-0.5 sm:mt-1">
                             on {formatDate(highestDay.date)}
                           </p>
                         </>
@@ -828,8 +914,8 @@ export function ExpenseAnalytics() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="border-t border-gray-800 p-4 sm:p-6">
-              <div className="text-sm text-gray-400">
+            <CardFooter className="border-t border-[#232b3b]/50 p-2.5 sm:p-6">
+              <div className="text-xs sm:text-sm text-gray-400">
                 {dailySpending.length > 0 &&
                   `Month to date: ₹${dailySpending.reduce((sum, day) => sum + day.amount, 0).toLocaleString()}`}
               </div>
