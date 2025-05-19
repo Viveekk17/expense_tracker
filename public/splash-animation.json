@@ -1,0 +1,71 @@
+{
+    "splashScreenAnimation": {
+      "duration": 3000,
+      "backgroundColor": {
+        "start": "#FFFFFF",
+        "end": "#F0F8FF",
+        "duration": 1000
+      },
+      "elements": [
+        {
+          "type": "icon",
+          "source": "icon.png", 
+          "animations": [
+            {
+              "name": "scale",
+              "startScale": 0.5,
+              "endScale": 1,
+              "duration": 1000,
+              "easing": "easeOutBounce"
+            },
+            {
+              "name": "slideIn",
+              "startPosition": {
+                "x": 0,
+                "y": -50
+              },
+              "endPosition": {
+                "x": 0,
+                "y": 0
+              },
+              "duration": 1000,
+              "easing": "easeOutQuint"
+            }
+          ]
+        },
+        {
+          "type": "text",
+          "content": "Walence",
+          "properties": {
+            "fontSize": "32px",
+            "color": "#003B5C"
+          },
+          "animations": [
+            {
+              "name": "fadeIn",
+              "duration": 1000,
+              "delay": 500,
+              "startOpacity": 0,
+              "endOpacity": 1,
+              "easing": "easeInCubic"
+            },
+            {
+              "name": "slideUp",
+              "startPosition": {
+                "x": 0,
+                "y": 50
+              },
+              "endPosition": {
+                "x": 0,
+                "y": 0
+              },
+              "duration": 1000,
+              "delay": 500,
+              "easing": "easeInOutExpo"
+            }
+          ]
+        }
+      ]
+    }
+  }
+  

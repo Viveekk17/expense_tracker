@@ -3,6 +3,15 @@ import { getCurrentUser } from './awsAuthService';
 
 const API_NAME = 'CampusExpenseCompassAPI';
 
+// Detect if running in a mobile environment
+const isMobileApp = (): boolean => {
+  return typeof window !== 'undefined' && 
+         (window.navigator.userAgent.includes('Android') || 
+          window.navigator.userAgent.includes('iPhone') ||
+          document.URL.indexOf('http://') === -1 && 
+          document.URL.indexOf('https://') === -1);
+};
+
 // Local storage functions
 const saveToLocalStorage = (key: string, data: any) => {
   try {
@@ -402,26 +411,40 @@ export const generateReportUrl = async (): Promise<string> => {
     
     const csvContent = BOM + headers + rows;
     
-    // Create a blob with specific type for Excel
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    // Try AWS in background but don't wait for it
-    syncToAWS(async () => {
-      const operation = get({
-        apiName: API_NAME,
-        path: `/reports/${userId}`,
-        options: {
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+    // Handle mobile and web differently
+    if (isMobileApp()) {
+      console.log('Running in mobile environment, using alternative export method');
+      
+      // For Android, we'll return the CSV content directly instead of a URL
+      // The calling component will need to handle this differently
+      return JSON.stringify({
+        fileName: `expense-report-${userId}-${new Date().toISOString().split('T')[0]}.csv`,
+        mimeType: 'text/csv;charset=utf-8;',
+        content: csvContent,
+        isMobile: true
       });
-      await operation.response;
-    });
-    
-    // Return the local URL immediately
-    return url;
+    } else {
+      // Web browser approach - create a Blob URL
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      
+      // Try AWS in background but don't wait for it
+      syncToAWS(async () => {
+        const operation = get({
+          apiName: API_NAME,
+          path: `/reports/${userId}`,
+          options: {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        });
+        await operation.response;
+      });
+      
+      // Return the local URL immediately
+      return url;
+    }
   } catch (error) {
     console.error('Error generating report:', error);
     throw error;

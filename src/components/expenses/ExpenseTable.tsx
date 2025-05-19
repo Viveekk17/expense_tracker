@@ -25,6 +25,16 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { saveCSVToDevice } from '@/services/fileExportPlugin';
+
+// Helper to detect mobile environment
+const isMobileApp = (): boolean => {
+  return typeof window !== 'undefined' && 
+         (window.navigator.userAgent.includes('Android') || 
+          window.navigator.userAgent.includes('iPhone') ||
+          document.URL.indexOf('http://') === -1 && 
+          document.URL.indexOf('https://') === -1);
+};
 
 const ExpenseTable: React.FC = () => {
   const { expenses, categories, generateReport, deleteExpense } = useExpense();
@@ -49,9 +59,81 @@ const ExpenseTable: React.FC = () => {
   const handleDownloadReport = async () => {
     try {
       setLoading(true);
-      const url = await generateReport();
-      if (url) {
-        window.open(url, '_blank');
+      const response = await generateReport();
+      
+      if (!response) return;
+      
+      // Check if the response is a JSON string (used for mobile)
+      try {
+        const parsedResponse = JSON.parse(response);
+        if (parsedResponse.isMobile) {
+          console.log('Handling mobile CSV export');
+          
+          try {
+            // First try our custom native plugin
+            await saveCSVToDevice(parsedResponse.content, parsedResponse.fileName);
+            console.log('Export successful using native plugin');
+            return;
+          } catch (nativeError) {
+            console.error('Native export failed, trying fallback:', nativeError);
+            
+            // Fallback to data URI approach
+            const encodedContent = encodeURIComponent(parsedResponse.content);
+            const dataUri = `data:${parsedResponse.mimeType};charset=utf-8,${encodedContent}`;
+            
+            // Try to detect if we have access to Capacitor File API
+            if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Filesystem) {
+              // Use Capacitor's Filesystem API to write the file
+              try {
+                const { Filesystem } = window.Capacitor.Plugins;
+                const fileName = parsedResponse.fileName;
+                
+                await Filesystem.writeFile({
+                  path: fileName,
+                  data: parsedResponse.content,
+                  directory: 'DOCUMENTS',
+                  encoding: 'utf8'
+                });
+                
+                console.log('File written successfully to device');
+                
+                // Share the file if possible
+                if (window.Capacitor.Plugins.Share) {
+                  await window.Capacitor.Plugins.Share.share({
+                    title: 'Expense Report',
+                    text: 'Here is your expense report',
+                    url: fileName,
+                    dialogTitle: 'Share your expense report'
+                  });
+                }
+              } catch (e) {
+                console.error('Error saving file with Capacitor:', e);
+                
+                // Final fallback to creating a hidden link and clicking it
+                const a = document.createElement('a');
+                a.href = dataUri;
+                a.download = parsedResponse.fileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+              }
+            } else {
+              // Fallback for mobile browsers without Capacitor
+              const a = document.createElement('a');
+              a.href = dataUri;
+              a.download = parsedResponse.fileName;
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+            }
+          }
+        } else {
+          // Standard URL handling for web
+          window.open(response, '_blank');
+        }
+      } catch (e) {
+        // Not JSON, treat as a regular URL
+        window.open(response, '_blank');
       }
     } catch (error) {
       console.error('Failed to download report:', error);

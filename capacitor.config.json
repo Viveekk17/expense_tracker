@@ -1,0 +1,16 @@
+{
+  "appId": "com.walence.app",
+  "appName": "Walence",
+  "webDir": "dist",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "Filesystem": {
+      "androidPermissions": true
+    }
+  },
+  "android": {
+    "allowMixedContent": true,
+    "captureInput": false,
+    "webContentsDebuggingEnabled": true
+  }
+}

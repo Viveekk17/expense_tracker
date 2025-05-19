@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Walence</string>
+    <string name="title_activity_main">Walence</string>
+    <string name="package_name">com.walence.app</string>
+    <string name="custom_url_scheme">com.walence.app</string>
+</resources>

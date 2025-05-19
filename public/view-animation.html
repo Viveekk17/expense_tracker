@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Walence Splash Animation</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            flex-direction: column;
+        }
+        #animation-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 0 5px;
+            background-color: #1e78e3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+        }
+        .text {
+            position: absolute;
+            bottom: 50px;
+            width: 100%;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 32px;
+            color: #003B5C;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Walence Splash Animation</h1>
+    <div id="animation-container"></div>
+    <div class="controls">
+        <button id="play">Play</button>
+        <button id="stop">Reset</button>
+    </div>
+    
+    <script>
+        // Load the animation JSON
+        fetch('splash-animation.json')
+            .then(response => response.json())
+            .then(data => {
+                const animationData = data.splashScreenAnimation;
+                setupAnimation(animationData);
+            })
+            .catch(error => console.error('Error loading animation:', error));
+            
+        let animationInterval;
+        let container = document.getElementById('animation-container');
+        let isPlaying = false;
+        
+        function setupAnimation(animData) {
+            // Create container with background color transition
+            container.style.transition = `background-color ${animData.backgroundColor.duration}ms`;
+            
+            // Create icon element
+            const icon = document.createElement('img');
+            icon.src = 'icon.svg'; // Using the SVG icon we created
+            icon.className = 'icon';
+            container.appendChild(icon);
+            
+            // Create text element
+            const text = document.createElement('div');
+            text.className = 'text';
+            text.textContent = animData.elements[1].content;
+            container.appendChild(text);
+            
+            // Set up control buttons
+            document.getElementById('play').addEventListener('click', () => {
+                if (!isPlaying) {
+                    playAnimation(animData);
+                }
+            });
+            
+            document.getElementById('stop').addEventListener('click', () => {
+                resetAnimation();
+            });
+            
+            // Auto-play on page load after a small delay
+            setTimeout(() => {
+                playAnimation(animData);
+            }, 500);
+        }
+        
+        function playAnimation(animData) {
+            isPlaying = true;
+            resetAnimation();
+            
+            // Background color animation
+            container.style.backgroundColor = animData.backgroundColor.start;
+            setTimeout(() => {
+                container.style.backgroundColor = animData.backgroundColor.end;
+            }, 50);
+            
+            // Icon animations
+            const icon = container.querySelector('.icon');
+            if (icon) {
+                // Scale animation
+                const scaleAnim = animData.elements[0].animations[0];
+                icon.style.transition = `transform ${scaleAnim.duration}ms ${scaleAnim.easing}, 
+                                        opacity ${scaleAnim.duration}ms ease-in-out, 
+                                        top ${animData.elements[0].animations[1].duration}ms ${animData.elements[0].animations[1].easing}`;
+                icon.style.transform = `translate(-50%, -50%) scale(${scaleAnim.startScale})`;
+                icon.style.top = `calc(50% + ${animData.elements[0].animations[1].startPosition.y}px)`;
+                icon.style.opacity = '0';
+                
+                setTimeout(() => {
+                    icon.style.opacity = '1';
+                    icon.style.transform = `translate(-50%, -50%) scale(${scaleAnim.endScale})`;
+                    icon.style.top = `calc(50% + ${animData.elements[0].animations[1].endPosition.y}px)`;
+                }, 50);
+            }
+            
+            // Text animations
+            const text = container.querySelector('.text');
+            if (text) {
+                const fadeAnim = animData.elements[1].animations[0];
+                const slideAnim = animData.elements[1].animations[1];
+                
+                text.style.transition = `opacity ${fadeAnim.duration}ms ${fadeAnim.easing} ${fadeAnim.delay}ms, 
+                                        transform ${slideAnim.duration}ms ${slideAnim.easing} ${slideAnim.delay}ms`;
+                text.style.opacity = fadeAnim.startOpacity.toString();
+                text.style.transform = `translateY(${slideAnim.startPosition.y}px)`;
+                
+                setTimeout(() => {
+                    text.style.opacity = fadeAnim.endOpacity.toString();
+                    text.style.transform = `translateY(${slideAnim.endPosition.y}px)`;
+                }, 50);
+            }
+            
+            // Reset after complete animation
+            setTimeout(() => {
+                isPlaying = false;
+            }, animData.duration);
+        }
+        
+        function resetAnimation() {
+            if (animationInterval) {
+                clearInterval(animationInterval);
+            }
+            
+            const icon = container.querySelector('.icon');
+            const text = container.querySelector('.text');
+            
+            if (icon) {
+                icon.style.transition = 'none';
+                icon.style.opacity = '0';
+                icon.style.transform = 'translate(-50%, -50%) scale(0.5)';
+            }
+            
+            if (text) {
+                text.style.transition = 'none';
+                text.style.opacity = '0';
+                text.style.transform = 'translateY(50px)';
+            }
+        }
+    </script>
+</body>
+</html> 
