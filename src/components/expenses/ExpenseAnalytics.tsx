@@ -540,101 +540,135 @@ export function ExpenseAnalytics() {
         <TabsContent value="categories">
           <Card className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-blue-400 to-indigo-500"></div>
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-4 sm:p-6">
               <div className="w-full">
-                <CardTitle className="text-gray-300">Category Breakdown</CardTitle>
-                <CardDescription className="text-gray-400">
+                <CardTitle className="text-lg sm:text-xl text-gray-300">Category Breakdown</CardTitle>
+                <CardDescription className="text-sm text-gray-400 mt-1">
                   View how your spending is distributed across different categories
                 </CardDescription>
               </div>
               {/* Chart toggle: mobile as toggle group, desktop as button */}
               {categorySummary.length > 0 && (
-                <div className="w-full sm:w-auto mt-2 sm:mt-0 flex gap-2">
+                <div className="w-full sm:w-auto mt-2 sm:mt-0">
                   {/* Mobile: toggle group */}
-                  <div className="flex w-full sm:hidden gap-2">
+                  <div className="flex w-full sm:hidden gap-1.5 bg-gray-800/50 p-1 rounded-lg">
                     <button
-                      className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 ${categoryChartType === 'pie' ? 'bg-indigo-600/20 text-indigo-300 shadow' : 'bg-transparent text-gray-400 hover:text-primary'}`}
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                        categoryChartType === 'pie' 
+                          ? 'bg-indigo-600/20 text-indigo-300 shadow' 
+                          : 'bg-transparent text-gray-400 hover:text-primary'
+                      }`}
                       onClick={() => setCategoryChartType('pie')}
-                    >Pie Chart</button>
+                    >
+                      <PieChart className="h-4 w-4 inline-block mr-1.5" />
+                      Pie
+                    </button>
                     <button
-                      className={`flex-1 py-2 rounded-lg font-semibold transition-all duration-200 ${categoryChartType === 'bar' ? 'bg-indigo-600/20 text-indigo-300 shadow' : 'bg-transparent text-gray-400 hover:text-primary'}`}
+                      className={`flex-1 py-2 px-3 rounded-md text-sm font-medium transition-all duration-200 ${
+                        categoryChartType === 'bar' 
+                          ? 'bg-indigo-600/20 text-indigo-300 shadow' 
+                          : 'bg-transparent text-gray-400 hover:text-primary'
+                      }`}
                       onClick={() => setCategoryChartType('bar')}
-                    >Bar Chart</button>
+                    >
+                      <BarChart className="h-4 w-4 inline-block mr-1.5" />
+                      Bar
+                    </button>
                   </div>
                   {/* Desktop: single button */}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="hidden sm:block text-indigo-400 hover:text-indigo-300 bg-[#181f2a] border border-[#232b3b]"
-                    onClick={() => setCategoryChartType(categoryChartType === 'pie' ? 'bar' : 'pie')}
-                  >
-                    {categoryChartType === 'pie' ? 'Show Bar Chart' : 'Show Pie Chart'}
-                  </Button>
+                  <div className="hidden sm:block">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="rounded-full bg-indigo-600/20 border-indigo-500/30 text-indigo-400 hover:bg-indigo-600/30 hover:text-indigo-300"
+                      onClick={() => setCategoryChartType(categoryChartType === 'pie' ? 'bar' : 'pie')}
+                    >
+                      {categoryChartType === 'pie' ? (
+                        <>
+                          <BarChart className="h-4 w-4 mr-2" />
+                          Switch to Bar Chart
+                        </>
+                      ) : (
+                        <>
+                          <PieChart className="h-4 w-4 mr-2" />
+                          Switch to Pie Chart
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </CardHeader>
-            <CardContent>
-              <div className="h-[120px] sm:h-[220px] md:h-[300px] w-full flex items-center justify-center px-1">
-                {categorySummary.length > 0 ? (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <SwitchTransition mode="out-in">
-                      <CSSTransition
-                        key={categoryChartType}
-                        timeout={300}
-                        classNames="fade"
-                      >
-                        <div className="w-full h-full flex items-center justify-center">
-                          {categoryChartType === 'pie' ? (
-                            <SimplePieChart data={categorySummary} />
-                          ) : (
-                            <ResponsiveContainer width="100%" height="90%">
-                              <BarChart
-                                layout="vertical"
-                                data={categorySummary.slice(0, 5)}
-                                margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+            <CardContent className="p-4 sm:p-6">
+              {categorySummary.length > 0 ? (
+                <div className="h-[280px] sm:h-[400px] w-full">
+                  <SwitchTransition mode="out-in">
+                    <CSSTransition
+                      key={categoryChartType}
+                      timeout={300}
+                      classNames="fade"
+                    >
+                      <div className="w-full h-full flex items-center justify-center">
+                        {categoryChartType === 'pie' ? (
+                          <SimplePieChart data={categorySummary} />
+                        ) : (
+                          <ResponsiveContainer width="100%" height="100%">
+                            <BarChart
+                              layout="vertical"
+                              data={categorySummary.slice(0, 5)}
+                              margin={{ top: 10, right: 30, left: 40, bottom: 10 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
+                              <XAxis 
+                                type="number" 
+                                tickFormatter={(value) => `₹${value}`} 
+                                stroke="#94a3b8"
+                                tick={{ fontSize: 11, fill: '#94a3b8' }}
+                              />
+                              <YAxis 
+                                type="category" 
+                                dataKey="category" 
+                                tick={{ fontSize: 12, fill: '#94a3b8' }} 
+                                width={80} 
+                                stroke="#94a3b8" 
+                              />
+                              <Tooltip 
+                                formatter={(value) => [`₹${value}`, 'Amount']}
+                                contentStyle={{ 
+                                  backgroundColor: '#192031', 
+                                  borderColor: '#334155',
+                                  borderRadius: '8px',
+                                  padding: '8px'
+                                }}
+                                itemStyle={{ color: '#e2e8f0' }}
+                              />
+                              <Bar 
+                                dataKey="amount"
+                                animationBegin={0}
+                                animationDuration={1200}
+                                animationEasing="ease-in-out"
+                                radius={[0, 4, 4, 0]}
                               >
-                                <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#334155" />
-                                <XAxis type="number" tickFormatter={(value) => `₹${value}`} stroke="#94a3b8" />
-                                <YAxis 
-                                  type="category" 
-                                  dataKey="category" 
-                                  tick={{ fontSize: 11, fill: '#94a3b8' }} 
-                                  width={80} 
-                                  stroke="#94a3b8" 
-                                />
-                                <Tooltip 
-                                  formatter={(value) => [`₹${value}`, 'Amount']}
-                                  contentStyle={{ backgroundColor: '#192031', borderColor: '#334155' }}
-                                  itemStyle={{ color: '#e2e8f0' }}
-                                />
-                                <Bar 
-                                  dataKey="amount"
-                                  animationBegin={0}
-                                  animationDuration={1200}
-                                  animationEasing="ease-in-out"
-                                  radius={[0, 4, 4, 0]}
-                                >
-                                  {categorySummary.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                  ))}
-                                </Bar>
-                              </BarChart>
-                            </ResponsiveContainer>
-                          )}
-                        </div>
-                      </CSSTransition>
-                    </SwitchTransition>
-                  </div>
-                ) : (
-                  <div className="flex h-full items-center justify-center">
-                    <p className="text-center text-gray-400 text-sm sm:text-base">
-                      Add expenses to see category breakdown
-                    </p>
-                  </div>
-                )}
-              </div>
+                                {categorySummary.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                ))}
+                              </Bar>
+                            </BarChart>
+                          </ResponsiveContainer>
+                        )}
+                      </div>
+                    </CSSTransition>
+                  </SwitchTransition>
+                </div>
+              ) : (
+                <div className="flex h-[280px] sm:h-[400px] items-center justify-center">
+                  <p className="text-center text-gray-400 text-sm sm:text-base">
+                    Add expenses to see category breakdown
+                  </p>
+                </div>
+              )}
             </CardContent>
-            <CardFooter className="border-t border-gray-800 pt-4 flex justify-between">
+            <CardFooter className="border-t border-gray-800 p-4 sm:p-6 flex flex-col sm:flex-row sm:justify-between gap-2">
               <div className="text-sm text-gray-400">
                 {categorySummary.length > 0 && 
                   `Your highest spending is on ${categorySummary[0].category} (${categorySummary[0].percentage}% of total)`}
@@ -650,18 +684,18 @@ export function ExpenseAnalytics() {
         <TabsContent value="trends" className="space-y-4">
           <Card className="bg-[#121828] border-0 shadow-sm rounded-xl overflow-hidden">
             <div className="h-1 bg-gradient-to-r from-emerald-400 to-green-500"></div>
-            <CardHeader>
-              <div className="flex items-center justify-between w-full">
+            <CardHeader className="p-4 sm:p-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div>
-                  <CardTitle className="text-gray-300">Daily Spending Trends</CardTitle>
-                  <CardDescription className="text-gray-400">
+                  <CardTitle className="text-lg sm:text-xl text-gray-300">Daily Spending Trends</CardTitle>
+                  <CardDescription className="text-sm text-gray-400 mt-1">
                     Track your spending patterns over the last 30 days
                   </CardDescription>
                 </div>
-                <div className="flex items-center gap-2 ml-4">
+                <div className="flex items-center gap-2">
                   <span className="text-sm text-gray-400">View:</span>
                   <Select value={trendRange} onValueChange={v => setTrendRange(v as 'week' | 'month')}>
-                    <SelectTrigger className="w-[120px] bg-[#181f2a] border border-[#232b3b] text-gray-200">
+                    <SelectTrigger className="w-[120px] bg-[#181f2a] border border-[#232b3b] text-gray-200 text-sm">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -672,67 +706,83 @@ export function ExpenseAnalytics() {
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0">
-              <div className="flex flex-col h-[140px] sm:h-[220px] md:h-[300px] w-full px-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="h-[280px] sm:h-[400px] w-full">
                 {dailySpending.length > 0 ? (
-                  <div className="bg-[#1a2234] rounded-lg flex-1 flex flex-col w-full p-3 sm:p-4 min-h-0">
-                    <h4 className="text-base sm:text-lg font-semibold mb-2 text-gray-200">Daily Spending Pattern</h4>
-                    <div className="flex-1 flex items-center justify-center w-full min-h-0">
-                      <div className="w-full h-full mt-4 sm:mt-8">
-                        <SwitchTransition mode="out-in">
-                          <CSSTransition
-                            key={trendRange}
-                            timeout={300}
-                            classNames="fade"
-                            onEntered={() => setGraphKey(trendRange)}
-                          >
-                            <ResponsiveContainer width="100%" height="100%">
-                              <RechartsLineChart
-                                data={trendRange === 'week' ? dailySpending.slice(-7) : dailySpending}
-                                margin={{ top: 10, right: 20, left: 30, bottom: 40 }}
-                              >
-                                <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                                <XAxis 
-                                  dataKey="date" 
-                                  tickFormatter={formatDate}
-                                  tick={{ fontSize: 11, fill: '#cbd5e1' }}
-                                  height={60}
-                                  interval={trendRange === 'week' ? 0 : 4}
-                                  stroke="#94a3b8"
-                                  label={{ value: 'Date', position: 'insideBottom', offset: 0, fill: '#cbd5e1', fontSize: 12 }}
-                                />
-                                <YAxis 
-                                  tickFormatter={(value) => `₹${value}`}
-                                  stroke="#94a3b8"
-                                  tick={{ fontSize: 11, fill: '#cbd5e1' }}
-                                  label={{ value: 'Amount (₹)', angle: -90, position: 'insideLeft', fill: '#cbd5e1', fontSize: 12, offset: -5 }}
-                                />
-                                <Tooltip 
-                                  formatter={(value) => [`₹${value}`, 'Amount']}
-                                  labelFormatter={(value) => `Date: ${formatDate(value)}`}
-                                  contentStyle={{ backgroundColor: '#232b3b', borderColor: '#334155', borderRadius: 8, color: '#fff', fontWeight: 500, fontSize: 13 }}
-                                  itemStyle={{ color: '#fff' }}
-                                />
-                                <Line
-                                  type="monotone"
-                                  dataKey="amount"
-                                  stroke="#6366f1"
-                                  strokeWidth={2}
-                                  dot={{ r: 4, fill: '#fff', stroke: '#6366f1', strokeWidth: 2 }}
-                                  activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
-                                  animationBegin={0}
-                                  animationDuration={1500}
-                                  animationEasing="ease-out"
-                                />
-                              </RechartsLineChart>
-                            </ResponsiveContainer>
-                          </CSSTransition>
-                        </SwitchTransition>
-                      </div>
+                  <div className="bg-[#1a2234] rounded-lg h-full w-full p-3 sm:p-4">
+                    <div className="h-full w-full">
+                      <SwitchTransition mode="out-in">
+                        <CSSTransition
+                          key={trendRange}
+                          timeout={300}
+                          classNames="fade"
+                          onEntered={() => setGraphKey(trendRange)}
+                        >
+                          <ResponsiveContainer width="100%" height="100%">
+                            <RechartsLineChart
+                              data={trendRange === 'week' ? dailySpending.slice(-7) : dailySpending}
+                              margin={{ top: 10, right: 20, left: 30, bottom: 40 }}
+                            >
+                              <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                              <XAxis 
+                                dataKey="date" 
+                                tickFormatter={formatDate}
+                                tick={{ fontSize: 11, fill: '#cbd5e1' }}
+                                height={60}
+                                interval={trendRange === 'week' ? 0 : 4}
+                                stroke="#94a3b8"
+                                label={{ 
+                                  value: 'Date', 
+                                  position: 'insideBottom', 
+                                  offset: 0, 
+                                  fill: '#cbd5e1', 
+                                  fontSize: 12 
+                                }}
+                              />
+                              <YAxis 
+                                tickFormatter={(value) => `₹${value}`}
+                                stroke="#94a3b8"
+                                tick={{ fontSize: 11, fill: '#cbd5e1' }}
+                                label={{ 
+                                  value: 'Amount (₹)', 
+                                  angle: -90, 
+                                  position: 'insideLeft', 
+                                  fill: '#cbd5e1', 
+                                  fontSize: 12, 
+                                  offset: -5 
+                                }}
+                              />
+                              <Tooltip 
+                                formatter={(value) => [`₹${value}`, 'Amount']}
+                                labelFormatter={(value) => `Date: ${formatDate(value)}`}
+                                contentStyle={{ 
+                                  backgroundColor: '#232b3b', 
+                                  borderColor: '#334155', 
+                                  borderRadius: 8, 
+                                  padding: '8px',
+                                  fontSize: '13px'
+                                }}
+                                itemStyle={{ color: '#fff' }}
+                              />
+                              <Line
+                                type="monotone"
+                                dataKey="amount"
+                                stroke="#6366f1"
+                                strokeWidth={2}
+                                dot={{ r: 4, fill: '#fff', stroke: '#6366f1', strokeWidth: 2 }}
+                                activeDot={{ r: 6, fill: '#6366f1', stroke: '#fff', strokeWidth: 2 }}
+                                animationBegin={0}
+                                animationDuration={1500}
+                                animationEasing="ease-out"
+                              />
+                            </RechartsLineChart>
+                          </ResponsiveContainer>
+                        </CSSTransition>
+                      </SwitchTransition>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex h-full items-center justify-center">
+                  <div className="flex h-full items-center justify-center bg-[#1a2234] rounded-lg">
                     <p className="text-center text-gray-400 text-sm sm:text-base">
                       Add expenses to see daily spending trends
                     </p>
@@ -740,32 +790,32 @@ export function ExpenseAnalytics() {
                 )}
               </div>
               {dailySpending.length > 0 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mt-4">
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4 shadow-sm">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-4">
+                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
                     <h4 className="text-sm font-medium mb-1 text-gray-400">Last 7 Days</h4>
-                    <div className="text-xl sm:text-2xl font-bold text-white">
+                    <div className="text-lg sm:text-xl font-bold text-white">
                       ₹{dailySpending.slice(-7).reduce((sum, day) => sum + day.amount, 0).toLocaleString()}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       Total spending in past week
                     </p>
                   </div>
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4 shadow-sm">
+                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
                     <h4 className="text-sm font-medium mb-1 text-gray-400">Daily Average</h4>
-                    <div className="text-xl sm:text-2xl font-bold text-white">
+                    <div className="text-lg sm:text-xl font-bold text-white">
                       ₹{Math.round(dailySpending.slice(-30).reduce((sum, day) => sum + day.amount, 0) / 30).toLocaleString()}
                     </div>
                     <p className="text-xs text-gray-400 mt-1">
                       Average daily expense
                     </p>
                   </div>
-                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4 shadow-sm">
+                  <div className="bg-[#1a2234] rounded-lg p-3 sm:p-4">
                     <h4 className="text-sm font-medium mb-1 text-gray-400">Highest Day</h4>
                     {(() => {
                       const highestDay = [...dailySpending].sort((a, b) => b.amount - a.amount)[0];
                       return (
                         <>
-                          <div className="text-xl sm:text-2xl font-bold text-white">
+                          <div className="text-lg sm:text-xl font-bold text-white">
                             ₹{highestDay.amount.toLocaleString()}
                           </div>
                           <p className="text-xs text-gray-400 mt-1">
@@ -778,7 +828,7 @@ export function ExpenseAnalytics() {
                 </div>
               )}
             </CardContent>
-            <CardFooter className="border-t border-gray-800 pt-4">
+            <CardFooter className="border-t border-gray-800 p-4 sm:p-6">
               <div className="text-sm text-gray-400">
                 {dailySpending.length > 0 &&
                   `Month to date: ₹${dailySpending.reduce((sum, day) => sum + day.amount, 0).toLocaleString()}`}
